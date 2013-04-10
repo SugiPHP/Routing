@@ -1,0 +1,23 @@
+{
+    "name": "sugiphp/routing",
+    "type": "library",
+    "description": "Routing",
+    "keywords": ["route"],
+    "licence": "MIT",
+    "authors": [
+        {
+            "name": "Plamen Popov",
+            "email": "tzappa@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-0": { 
+            "SugiPHP\\Routing\\": ""
+        }
+    },
+    "target-dir": "SugiPHP/Routing",
+    "minimum-stability": "dev"
+}
