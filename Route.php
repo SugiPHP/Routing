@@ -42,25 +42,16 @@ class Route
 	}
 
 	/**
-	 * Returns variable $var.
+	 * Set expected path (pattern).
 	 * 
-	 * @param  string $var
-	 * @return string
-	 */
-	public function get($var)
-	{
-		return isset($this->variables[$var]) ? $this->variables[$var] : null;
-	}
-
-	/**
-	 * Set expected path
-	 * 
-	 * @param string $path
+	 * @param  string $path
 	 * @return SugiPHP\Routing\Route
 	 */
 	public function setPath($path)
 	{
-		$path = parse_url($path,  PHP_URL_PATH);
+		// Will not fix paths like /index.php?q=123 !
+		// $path = parse_url($path,  PHP_URL_PATH);
+		// This fix is OK!
 		$path = "/" . trim($path, "/");
 		$this->path = $path;
 
@@ -78,15 +69,29 @@ class Route
 	}
 
 	/**
-	 * Sets default values for variables in host or path (pattern)
-	 * and thus making them optional
+	 * Sets default values for variables in host and 
+	 * in the path (pattern) and thus making them optional.
 	 * 
-	 * @param array $defaults
+	 * @param  array $defaults
 	 * @return SugiPHP\Routing\Route
 	 */
 	public function setDefaults(array $defaults)
 	{
 		$this->defaults = $defaults;
+
+		return $this;
+	}
+
+	/**
+	 * Sets a default value for a parameter $key.
+	 * 
+	 * @param  string $key
+	 * @param  string $value
+	 * @return SugiPHP\Routing\Route
+	 */
+	public function setDefault($key, $value)
+	{
+		$this->defaults[$key] = $value;
 
 		return $this;
 	}
@@ -110,20 +115,6 @@ class Route
 	public function getDefault($key)
 	{
 		return isset($this->defaults[$key]) ? $this->defaults[$key] : null;
-	}
-
-	/**
-	 * Sets a default value for a parameter $key.
-	 * 
-	 * @param  string $key
-	 * @param  string $value
-	 * @return SugiPHP\Routing\Route
-	 */
-	public function setDefault($key, $value)
-	{
-		$this->defaults[$key] = $value;
-
-		return $this;
 	}
 
 	/**
@@ -154,6 +145,20 @@ class Route
 	}
 
 	/**
+	 * Sets a requisite - regular expression for a $key path or host variable.
+	 * 
+	 * @param  string $key
+	 * @param  string $value
+	 * @return SugiPHP\Routing\Route
+	 */
+	public function setRequisite($key, $value)
+	{
+		$this->requisites[$key] = $value;
+
+		return $this;
+	}
+
+	/**
 	 * Returns all registered requisites for the parameters in the path and for the host.
 	 * 
 	 * @return array
@@ -175,20 +180,6 @@ class Route
 	}
 
 	/**
-	 * Sets a requisite - regular expression for a $key path or host variable.
-	 * 
-	 * @param  string $key
-	 * @param  string $value
-	 * @return SugiPHP\Routing\Route
-	 */
-	public function setRequisite($key, $value)
-	{
-		$this->requisites[$key] = $value;
-
-		return $this;
-	}
-
-	/**
 	 * Checks a requisite is set for the host or path parameter $key.
 	 * 
 	 * @param  string  $key
@@ -207,11 +198,12 @@ class Route
 	 */
 	public function setHost($host)
 	{
-		$host = trim($host);
-		if ((strpos($host, "http://") !== 0) and (strpos($host, "https://") !== 0)) {
-			$host = "http://" . $host;
-		}
-		$host = parse_url($host,  PHP_URL_HOST);
+		// will NOT fix wrong hosts!
+		// $host = trim($host);
+		// if ((strpos($host, "http://") !== 0) and (strpos($host, "https://") !== 0)) {
+		// 	$host = "http://" . $host;
+		// }
+		// $host = parse_url($host,  PHP_URL_HOST);
 		$this->host = $host ?: null;
 
 		return $this;
@@ -310,7 +302,7 @@ class Route
 	}
 
 	/**
-	 * Matches the given scheme to registered scheme.
+	 * Checks the given shceme is within accepted route schemes.
 	 * 
 	 * @param  string $scheme
 	 * @return boolean
@@ -328,18 +320,34 @@ class Route
 		return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
 	}
 
+	/**
+	 * Checks the given method is within those registered in the Route.
+	 * 
+	 * @param  string $method - "GET", "POST", "HEAD", etc.
+	 * @return boolean
+	 */
 	public function matchMethod($method)
 	{
-		return (!$this->method or preg_match("#" . str_replace("#", "\\#", $this->method)."#i", $method));
+		if (!$this->method) {
+			return true;
+		}
+
+		return (bool) preg_match("#" . str_replace("#", "\\#", $this->method)."#i", $method);
 	}
 
+	/**
+	 * Checks the given host matches route's host.
+	 * 
+	 * @param  string $host - like "sub.example.com"
+	 * @return boolean
+	 */
 	public function matchHost($host)
 	{
 		if (!$this->host) {
 			return true;
 		}
 
-		if (preg_match($this->compile($this->host, "host"), $host, $matches)) {
+		if (preg_match($this->compile($this->host, $this->defaults, $this->requisites, "host"), $host, $matches)) {
 			// add matches in array to know variables in host name
 			foreach ($matches as $var => $value) {
 				if (!is_int($var) and $value) {
@@ -352,9 +360,33 @@ class Route
 		return false;
 	}
 
+	/**
+	 * Checks that given path matches root's path.
+	 * 
+	 * @param  string $path
+	 * @return boolean
+	 */
 	public function matchPath($path)
 	{
-		$regEx = $this->compile($this->path, "path");
+		$path = "/" . trim($path, "/");
+
+		// copy requisites, so we can change them temporary
+		$requisites = array_merge($this->requisites);
+
+		// special {_format} parameter
+		if (strpos($this->path, ".{_format}") !== false) {
+			if ($requisite = $this->getRequisite("_format")) {
+				$requisites["_format"] = "\.(" . $requisite . ")";
+			} else {
+				$requisites["_format"] = "\.\w+";
+			}
+			$routePath = str_replace(".{_format}", "{_format}", $this->path);
+		} else {
+			$routePath = $this->path;
+		}
+
+		$regEx = $this->compile($routePath, $this->defaults, $requisites, "path");
+
 		if (preg_match($regEx, $path, $matches)) {
 			// add matches in array to know variables in path name
 			foreach ($matches as $var => $value) {
@@ -369,13 +401,26 @@ class Route
 	}
 
 	/**
+	 * Returns variable $var.
+	 * 
+	 * @param  string $var
+	 * @return string
+	 */
+	public function get($var)
+	{
+		return isset($this->variables[$var]) ? $this->variables[$var] : null;
+	}
+
+	/**
 	 * Create regular expression for the host or for the path
 	 * 
 	 * @param  string $pattern
+	 * @param  array  $defaults
+	 * @param  arrat  $requisites
 	 * @param  string $style - "host" or "path"
 	 * @return string
 	 */
-	protected function compile($pattern, $style)
+	protected function compile($pattern, $defaults, $requisites, $style)
 	{
 		$regex = $pattern;
 		// $regex = preg_replace('#[.\\+?[^\\]$()<>=!]#', '\\\\$0', $regex);
@@ -385,7 +430,7 @@ class Route
 			$defaultRequisites = "[^.,;?<>]+";
 		} elseif ($style === "path") {
 			$delimiter = "/";
-			$defaultRequisites = "[^/,;?<>]+";
+			$defaultRequisites = "[^/.,;?<>]+";
 		} else {
 			throw new \Exception("Unknown style $style");
 		}
@@ -395,11 +440,11 @@ class Route
 			$variable = $match[1][0];
 			$varPattern = $match[0][0]; // {variable}
 			$varPos = $match[0][1];
-			$capture = array_key_exists($variable, $this->requisites) ? $this->requisites[$variable] : $defaultRequisites;
+			$capture = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
 			$nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
 			$prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
 
-			if ($this->hasDefault($variable)) {
+			if (array_key_exists($variable, $defaults)) {
 				// Make variables that have default values optional
 				// Also make delimiter (if next char is a delimiter) to be also optional
 				if ($style == "host" and $nextChar == $delimiter and ($prevChar == "" or $prevChar == $delimiter)) {
