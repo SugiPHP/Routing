@@ -6,10 +6,9 @@
  * @author     Plamen Popov <tzappa@gmail.com>
  * @license    http://opensource.org/licenses/mit-license.php (MIT License)
  */
+namespace SugiPHP\Routing;
 
-use SugiPHP\Routing\Route;
-
-class RouteMatchTest extends PHPUnit_Framework_TestCase
+class RouteMatchTest extends \PHPUnit_Framework_TestCase
 {
 	public function testHomePath()
 	{

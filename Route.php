@@ -311,15 +311,19 @@ class Route
 	 */
 	public function matchScheme($scheme)
 	{
-		if ($this->scheme == "http") {
-			$regex = "http";
-		} elseif ($this->scheme == "https") {
-			$regex = "https";
-		} else {
-			$regex = "http(s)?";
+		// does not to be so complicated
+		// if ($this->scheme == "http") {
+		// 	$regex = "http";
+		// } elseif ($this->scheme == "https") {
+		// 	$regex = "https";
+		// }
+		// return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
+
+		if (!$this->scheme) {
+			return true;
 		}
 
-		return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
+		return ($this->scheme == $scheme);
 	}
 
 	/**
@@ -487,7 +491,6 @@ class Route
 			$variable = $match[1][0];
 			$varPattern = $match[0][0]; // {variable}
 			$varPos = $match[0][1];
-			$capture = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
 			$nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
 			$prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
 			$param = empty($parameters[$variable]) ? null : $parameters[$variable];
@@ -521,7 +524,11 @@ class Route
 
 			$pattern = str_replace($varPattern, $replace, $pattern);
 			if (!$replace) {
-				$pattern = rtrim($pattern, "/");
+				if ($variable == "_format") {
+					$pattern = rtrim($pattern, ".");
+				} else {
+					$pattern = rtrim($pattern, "/");
+				}
 			}
 		}
 

@@ -7,9 +7,9 @@
  * @license    http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
-use SugiPHP\Routing\Route;
+namespace SugiPHP\Routing;
 
-class RouteTest extends PHPUnit_Framework_TestCase
+class RouteTest extends \PHPUnit_Framework_TestCase
 {
 	public function testCreateWithPath()
 	{
@@ -289,7 +289,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($route->matchPath("/path/to/file.")); 
 	}
 
-	public function testMatchPathWithSpecial_format()
+	public function testMatchPathWithSpecialFormat()
 	{
 		$route = new Route("/path/to/file.{_format}", array("_format" => ""));
 
@@ -511,8 +511,8 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($route->matchScheme("https://"));
 		$this->assertTrue($route->matchScheme("HTTP"));
 		$this->assertTrue($route->matchScheme("HTTPS"));
-		// not http/https
-		$this->assertFalse($route->matchScheme("ftp"));
+		// not http/https, but should not happen
+		$this->assertTrue($route->matchScheme("ftp"));
 
 		// only http
 		$route->setScheme("http");

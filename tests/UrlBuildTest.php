@@ -9,8 +9,6 @@
 
 namespace SugiPHP\Routing;
 
-use SugiPHP\Routing\Route;
-
 class UrlBuildTest extends \PHPUnit_Framework_TestCase
 {
 	public function testBuildHome()
@@ -125,4 +123,62 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
 		// will not be build
 		$this->assertFalse($route->build(array("lang" => "fr")));
 	}
+
+	public function testMatchPathWithSpecialFormat()
+	{
+		$route = new Route("/foo/file.{_format}", array("_format" => ""));
+		$this->assertEquals("/foo/file.php", $route->build(array("_format" => "php")));
+		$this->assertEquals("/foo/file", $route->build(array("_format" => "")));
+		$this->assertEquals("/foo/file", $route->build());
+	}
+
+	public function testWith2Params()
+	{
+		$route = new Route("/{lang}/view/{slug}");
+
+		$this->assertEquals("/en/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertFalse($route->build(array("slug" => "test")));
+		$this->assertFalse($route->build(array("lang" => "en")));
+		$this->assertFalse($route->build());
+
+		$route = new Route("/{lang}/view/{slug}", array("lang" => ""));
+		$this->assertEquals("/en/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertEquals("/view/test", $route->build(array("slug" => "test")));
+		$this->assertFalse($route->build(array("lang" => "en")));
+		$this->assertFalse($route->build());
+
+		$route = new Route("/{lang}/view/{slug}", array("lang" => "en"));
+		$this->assertEquals("/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertEquals("/bg/view/test", $route->build(array("lang" => "bg", "slug" => "test")));
+		$this->assertEquals("/view/test", $route->build(array("slug" => "test")));
+		$this->assertFalse($route->build(array("lang" => "en")));
+		$this->assertFalse($route->build());
+
+		$route = new Route("/{lang}/view/{slug}", array("slug" => ""));
+		$this->assertEquals("/en/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertEquals("/en/view", $route->build(array("lang" => "en")));
+		$this->assertEquals("/en/view", $route->build(array("lang" => "en", "slug" => "")));
+		$this->assertFalse($route->build(array("slug" => "test")));
+		$this->assertFalse($route->build());
+
+		$route = new Route("/{lang}/view/{slug}", array("slug" => "foo"));
+		$this->assertEquals("/en/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertEquals("/en/view", $route->build(array("lang" => "en")));
+		$this->assertEquals("/en/view", $route->build(array("lang" => "en", "slug" => "foo")));
+		$this->assertEquals("/en/view", $route->build(array("lang" => "en", "slug" => "")));
+		$this->assertFalse($route->build(array("slug" => "test")));
+		$this->assertFalse($route->build(array("slug" => "foo")));
+		$this->assertFalse($route->build());
+
+		$route = new Route("/{lang}/view/{slug}", array("slug" => "foo", "lang" => "en"));
+		$this->assertEquals("/view/test", $route->build(array("lang" => "en", "slug" => "test")));
+		$this->assertEquals("/bg/view/test", $route->build(array("lang" => "bg", "slug" => "test")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "foo")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "foo")));
+		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "")));
+	}
+
 }
