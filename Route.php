@@ -16,7 +16,7 @@ namespace SugiPHP\Routing;
  *  - method (GET, POST, etc.)
  *  - ...
  */
-class Route
+class Route implements RouteInterface
 {
 	protected $path = "/";
 	protected $host = null; // null means all
@@ -277,7 +277,7 @@ class Route
 	 * @param  string $method - "GET", "POST", etc.
 	 * @param  string $host - "example.com"
 	 * @param  string $scheme - "http" or "https"
-	 * @return boolean - true if the request match defined route
+	 * @return array|false - true if the request match defined route, false if there is no match
 	 */
 	public function match($path, $method, $host, $scheme)
 	{
@@ -300,7 +300,7 @@ class Route
 			return false;
 		}
 
-		return true;
+		return $this->variables;
 	}
 
 	/**
@@ -406,6 +406,65 @@ class Route
 		return false;
 	}
 
+	public function build(array $parameters = array())
+	{
+		$pattern = $this->path;
+		$requisites = $this->requisites;
+		$defaults = $this->defaults;
+		$defaultRequisites = $this->defaultPathRequisites;
+
+		preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+		$cnt = count($matches);
+		$last = true;
+		while ($cnt--) {
+			$match = $matches[$cnt];
+			$variable = $match[1][0];
+			$varPattern = $match[0][0]; // {variable}
+			$varPos = $match[0][1];
+			$nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
+			$prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
+			$param = empty($parameters[$variable]) ? null : $parameters[$variable];
+			$default = array_key_exists($variable, $defaults) ? $defaults[$variable] : null;
+			$requisite = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
+
+			if ($param and !preg_match("#^".$requisite."$#", $param)) {
+				return false;
+			}
+
+			if (!is_null($default) and !is_null($param)) {
+				// if the given param value is equal to the default value for that parameter we'll leave it empty
+				if ($param == $default) {
+					$replace = "";
+				} elseif ($param) {
+					$replace = $param;
+				} else {
+					$replace = $default;
+				}
+			} elseif (!is_null($param)) {
+				if (!$param) {
+					return false;
+				} else {
+					$replace = $param;
+				}
+			} elseif (!is_null($default)) {
+				$replace = "";
+			} else {
+				return false;
+			}
+
+			$pattern = str_replace($varPattern, $replace, $pattern);
+			if (!$replace) {
+				if ($variable == "_format") {
+					$pattern = rtrim($pattern, ".");
+				} else {
+					$pattern = rtrim($pattern, "/");
+				}
+			}
+		}
+
+		return "/".trim($pattern, "/");
+	}
+
 	/**
 	 * Returns variable $var.
 	 * 
@@ -474,64 +533,5 @@ class Route
 		}
 
 		return "#^".$regex.'$#siuD';
-	}
-
-	public function build(array $parameters = array())
-	{
-		$pattern = $this->path;
-		$requisites = $this->requisites;
-		$defaults = $this->defaults;
-		$defaultRequisites = $this->defaultPathRequisites;
-
-		preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
-		$cnt = count($matches);
-		$last = true;
-		while ($cnt--) {
-			$match = $matches[$cnt];
-			$variable = $match[1][0];
-			$varPattern = $match[0][0]; // {variable}
-			$varPos = $match[0][1];
-			$nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
-			$prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
-			$param = empty($parameters[$variable]) ? null : $parameters[$variable];
-			$default = array_key_exists($variable, $defaults) ? $defaults[$variable] : null;
-			$requisite = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
-
-			if ($param and !preg_match("#^".$requisite."$#", $param)) {
-				return false;
-			}
-
-			if (!is_null($default) and !is_null($param)) {
-				// if the given param value is equal to the default value for that parameter we'll leave it empty
-				if ($param == $default) {
-					$replace = "";
-				} elseif ($param) {
-					$replace = $param;
-				} else {
-					$replace = $default;
-				}
-			} elseif (!is_null($param)) {
-				if (!$param) {
-					return false;
-				} else {
-					$replace = $param;
-				}
-			} elseif (!is_null($default)) {
-				$replace = "";
-			} else {
-				return false;
-			}
-
-			$pattern = str_replace($varPattern, $replace, $pattern);
-			if (!$replace) {
-				if ($variable == "_format") {
-					$pattern = rtrim($pattern, ".");
-				} else {
-					$pattern = rtrim($pattern, "/");
-				}
-			}
-		}
-
-		return "/".trim($pattern, "/");
 	}
 }
