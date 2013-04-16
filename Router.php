@@ -127,7 +127,14 @@ class Router implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * @return array|null
+	 * Walks through all registered routes and returns first route that matches 
+	 * the given parameters.
+	 *
+	 * @param  string $path
+	 * @param  string $method "GET", "POST", "PUT" etc. HTTP methods
+	 * @param  string @host
+	 * @param  string $scheme "http" or "https" scheme
+	 * @return array|null returns NULL if no route matches given parameters
 	 */
 	public function match($path, $method, $host, $scheme)
 	{
