@@ -406,6 +406,15 @@ class Route implements RouteInterface
 		return false;
 	}
 
+	/**
+	 * Builds an URI based on the pattern, default values and given parameters.
+	 * If some parameter is not set the default value will be used.
+	 * If some parameters are equal to their default values they can be skipped,
+	 * thus making a more friendly URL.
+	 * 
+	 * @param  array  $parameters
+	 * @return string
+	 */
 	public function build(array $parameters = array())
 	{
 		$pattern = $this->path;
