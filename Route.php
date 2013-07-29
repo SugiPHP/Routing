@@ -443,7 +443,7 @@ class Route implements RouteInterface
 			if (!is_null($default) and !is_null($param)) {
 				// if the given param value is equal to the default value for that parameter we'll leave it empty
 				if ($param == $default) {
-					$replace = "";
+					$replace = ($last) ? $default : "";
 				} elseif ($param) {
 					$replace = $param;
 				} else {
@@ -459,6 +459,10 @@ class Route implements RouteInterface
 				$replace = "";
 			} else {
 				return false;
+			}
+
+			if ($replace) {
+				$last = false;
 			}
 
 			$pattern = str_replace($varPattern, $replace, $pattern);
