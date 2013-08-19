@@ -475,7 +475,7 @@ class Route implements RouteInterface
 			}
 		}
 
-		return "/".trim($pattern, "/");
+		return "/".trim(str_replace("//", "/", $pattern), "/");
 	}
 
 	/**
