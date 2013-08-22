@@ -17,6 +17,8 @@ class Router implements \Countable, \IteratorAggregate
 	 */
 	protected $routes = array();
 
+	private $path, $method, $host, $scheme, $checkedRoutes = array();
+
 	/**
 	 * Adds a route to the end of the list.
 	 * 
@@ -132,16 +134,42 @@ class Router implements \Countable, \IteratorAggregate
 	 *
 	 * @param  string $path
 	 * @param  string $method "GET", "POST", "PUT" etc. HTTP methods
-	 * @param  string @host
+	 * @param  string $host
 	 * @param  string $scheme "http" or "https" scheme
 	 * @return array|null returns NULL if no route matches given parameters
 	 */
 	public function match($path, $method, $host, $scheme)
 	{
+		$this->checkedRoutes = array();
+		$this->path = $path;
+		$this->method = $method;
+		$this->host = $host;
+		$this->scheme = $scheme;
+
 		foreach ($this->routes as $name => $route) {
+			$this->checkedRoutes[] = $name;
 			$match = $route->match($path, $method, $host, $scheme);
 			if ($match !== false) {
 				return array_merge(array("_name" => $name/*, "_route" => $route*/), $match);
+			}
+		}
+	}
+
+	/**
+	 * Continue matching registered routes.
+	 * @see match()
+	 * 
+	 * @return array|null returns NULL if no route matches given parameters
+	 */
+	public function matchNext()
+	{
+		foreach ($this->routes as $name => $route) {
+			if ( ! in_array($name, $this->checkedRoutes)) {
+				$this->checkedRoutes[] = $name;
+				$match = $route->match($this->path, $this->method, $this->host, $this->scheme);
+				if ($match !== false) {
+					return array_merge(array("_name" => $name/*, "_route" => $route*/), $match);
+				}
 			}
 		}
 	}
