@@ -98,6 +98,15 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("/view", $route->build(array()));
 		// will not be build
 		$this->assertFalse($route->build(array("lang" => "en.bg")));
+
+		$route = new Route("/show/{site}/list", array("site" => "main"));
+		$this->assertEquals("/show/list", $route->build(array("site" => "main")));
+
+		$route = new Route("{site}/{category}/list/{page}", array("controller" => "category", "page" => 1, "site" => "main"));
+		$this->assertEquals("/show/list", $route->build(array("category" => "show")));
+		$this->assertEquals("/second/show/list", $route->build(array("site"=>"second", "category" => "show")));
+		$this->assertEquals("/second/show/list/3", $route->build(array("site"=>"second", "category" => "show", "page" => 3)));
+		$this->assertEquals("/show/list/3", $route->build(array("site"=>"main", "category" => "show", "page" => 3)));
 	}
 
 	public function testBuildWithOneParamAndDefaultEmptyAndRequisite()
