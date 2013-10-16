@@ -30,7 +30,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param string $path - the path pattern, usually with variables like "/{controller}/{action}/{id}"
 	 * @param array  $defaults - default values for variables in the path or for the host
 	 *                         array("id" => "", "action" => "index")
@@ -45,7 +45,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Set expected path (pattern).
-	 * 
+	 *
 	 * @param  string $path
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -62,7 +62,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns expected path (pattern).
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getPath()
@@ -71,9 +71,9 @@ class Route implements RouteInterface
 	}
 
 	/**
-	 * Sets default values for variables in host and 
+	 * Sets default values for variables in host and
 	 * in the path (pattern) and thus making them optional.
-	 * 
+	 *
 	 * @param  array $defaults
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -86,7 +86,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Sets a default value for a parameter $key.
-	 * 
+	 *
 	 * @param  string $key
 	 * @param  string $value
 	 * @return SugiPHP\Routing\Route
@@ -100,7 +100,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns all default values.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getDefaults()
@@ -110,7 +110,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns a default value for a given parameter $key.
-	 * 
+	 *
 	 * @param  string $key
 	 * @return string|null - null means that no default parameter was set
 	 */
@@ -121,7 +121,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks a default value is set.
-	 * 
+	 *
 	 * @param  string $key
 	 * @return boolean
 	 */
@@ -135,7 +135,7 @@ class Route implements RouteInterface
 	 * <code>
 	 *  array("lang" => "en|bg");
 	 * </code>
-	 * 
+	 *
 	 * @param  array $requisites
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -148,7 +148,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Sets a requisite - regular expression for a $key path or host variable.
-	 * 
+	 *
 	 * @param  string $key
 	 * @param  string $value
 	 * @return SugiPHP\Routing\Route
@@ -162,7 +162,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns all registered requisites for the parameters in the path and for the host.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getRequisites()
@@ -172,7 +172,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns a requisite (RegEx) for a path or host variable $key.
-	 * 
+	 *
 	 * @param  string $key
 	 * @return stting|null - null means no RegEx is set
 	 */
@@ -183,7 +183,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks a requisite is set for the host or path parameter $key.
-	 * 
+	 *
 	 * @param  string  $key
 	 * @return boolean
 	 */
@@ -194,7 +194,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Sets expected host (pattern)
-	 * 
+	 *
 	 * @param  string $host
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -213,7 +213,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns expected host.
-	 * 
+	 *
 	 * @return string|null - returns null for ANY host
 	 */
 	public function getHost()
@@ -223,7 +223,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Set request methods for which the Route should work.
-	 * 
+	 *
 	 * @param  string|null $method - null matches any method
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -236,7 +236,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Get expected request method
-	 * 
+	 *
 	 * @return string|null - null means ALL
 	 */
 	public function getMethod()
@@ -246,7 +246,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Expected HTTP scheme: "http" or "https"
-	 * 
+	 *
 	 * @param  string|null $scheme - null means all
 	 * @return SugiPHP\Routing\Route
 	 */
@@ -262,7 +262,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns expected scheme: "http" or "https"
-	 * 
+	 *
 	 * @return string|null - returns null for ANY scheme
 	 */
 	public function getScheme()
@@ -305,7 +305,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks the given shceme is within accepted route schemes.
-	 * 
+	 *
 	 * @param  string $scheme
 	 * @return boolean
 	 */
@@ -328,7 +328,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks the given method is within those registered in the Route.
-	 * 
+	 *
 	 * @param  string $method - "GET", "POST", "HEAD", etc.
 	 * @return boolean
 	 */
@@ -343,7 +343,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks the given host matches route's host.
-	 * 
+	 *
 	 * @param  string $host - like "sub.example.com"
 	 * @return boolean
 	 */
@@ -368,7 +368,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Checks that given path matches root's path.
-	 * 
+	 *
 	 * @param  string $path
 	 * @return boolean
 	 */
@@ -411,7 +411,7 @@ class Route implements RouteInterface
 	 * If some parameter is not set the default value will be used.
 	 * If some parameters are equal to their default values they can be skipped,
 	 * thus making a more friendly URL.
-	 * 
+	 *
 	 * @param  array  $parameters
 	 * @return string
 	 */
@@ -475,7 +475,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Returns variable $var.
-	 * 
+	 *
 	 * @param  string $var
 	 * @return string
 	 */
@@ -486,7 +486,7 @@ class Route implements RouteInterface
 
 	/**
 	 * Create regular expression for the host or for the path
-	 * 
+	 *
 	 * @param  string $pattern
 	 * @param  array  $defaults
 	 * @param  arrat  $requisites
@@ -533,7 +533,7 @@ class Route implements RouteInterface
 
 			$this->variables[$variable] = $this->getDefault($variable);
 		}
-		
+
 		if ($style == "host") {
 			$regex = str_replace(".", "\.", $regex);
 		} else {

@@ -12,7 +12,7 @@ class Router implements \Countable, \IteratorAggregate
 {
 	/**
 	 * A list of Route instances.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $routes = array();
@@ -21,7 +21,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Adds a route to the end of the list.
-	 * 
+	 *
 	 * @param  string $name The route's name
 	 * @param  RouteInterface $route
 	 * @return Router
@@ -37,9 +37,9 @@ class Router implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * Sets a route. If the route with this name already exists in the list it will be set on top of it, 
+	 * Sets a route. If the route with this name already exists in the list it will be set on top of it,
 	 * otherwise it will be added to the end of the list.
-	 * 
+	 *
 	 * @param  string $name The route's name
 	 * @param  RouterInterface $route
 	 * @return Router
@@ -53,7 +53,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Returns a route instance by it's name.
-	 * 
+	 *
 	 * @param  string $name
 	 * @return RouteInterface
 	 */
@@ -64,7 +64,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Checks the route with this name exists in the list.
-	 * 
+	 *
 	 * @param  string $name
 	 * @return boolean
 	 */
@@ -75,7 +75,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Removes route with the name given.
-	 * 
+	 *
 	 * @param  string $name
 	 * @return Router
 	 */
@@ -88,7 +88,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Removes all registered routes from the list.
-	 * 
+	 *
 	 * @return Router
 	 */
 	public function flush()
@@ -100,7 +100,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Returns all registered routes
-	 * 
+	 *
 	 * @return array
 	 */
 	public function all()
@@ -129,7 +129,7 @@ class Router implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * Walks through all registered routes and returns first route that matches 
+	 * Walks through all registered routes and returns first route that matches
 	 * the given parameters.
 	 *
 	 * @param  string $path
@@ -158,7 +158,7 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Continue matching registered routes.
 	 * @see match()
-	 * 
+	 *
 	 * @return array|null returns NULL if no route matches given parameters
 	 */
 	public function matchNext()
@@ -172,5 +172,21 @@ class Router implements \Countable, \IteratorAggregate
 				}
 			}
 		}
+	}
+
+	/**
+	 * Builds an URI based on parameters given.
+	 *
+	 * @param  string $name Route name
+	 * @param  array  $params
+	 * @return string|null Will return URI or NULL if the route is not found
+	 */
+	public function build($name, $params = array())
+	{
+		if (!$route = $this->get($name)) {
+			return null;
+		}
+
+		return $route->build($params);
 	}
 }
