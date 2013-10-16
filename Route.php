@@ -19,9 +19,7 @@ namespace SugiPHP\Routing;
 class Route implements RouteInterface
 {
 	protected $path = "/";
-	protected $host = null; // null means all
 	protected $method = null; // null means all - GET, HEADER, POST, PUT, DELETE, ...
-	protected $scheme = null; // null means all - http, https
 	protected $defaults = array();
 	protected $requisites = array();
 	protected $variables = array();
@@ -206,7 +204,7 @@ class Route implements RouteInterface
 		// 	$host = "http://" . $host;
 		// }
 		// $host = parse_url($host,  PHP_URL_HOST);
-		$this->host = $host ?: null;
+		$this->defaults["_host"] = $host ?: null;
 
 		return $this;
 	}
@@ -218,7 +216,7 @@ class Route implements RouteInterface
 	 */
 	public function getHost()
 	{
-		return $this->host;
+		return $this->getDefault("_host");
 	}
 
 	/**
@@ -255,7 +253,7 @@ class Route implements RouteInterface
 		if (!in_array(strtolower($scheme), array("", "http", "https"))) {
 			$scheme = null;
 		}
-		$this->scheme = $scheme ?: null;
+		$this->defaults["_scheme"] = $scheme ?: null;
 
 		return $this;
 	}
@@ -267,7 +265,7 @@ class Route implements RouteInterface
 	 */
 	public function getScheme()
 	{
-		return $this->scheme;
+		return $this->getDefault("_scheme");
 	}
 
 	/**
@@ -319,11 +317,11 @@ class Route implements RouteInterface
 		// }
 		// return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
 
-		if (!$this->scheme) {
+		if (!$this->getScheme()) {
 			return true;
 		}
 
-		return ($this->scheme == $scheme);
+		return ($this->getScheme() == $scheme);
 	}
 
 	/**
@@ -349,11 +347,11 @@ class Route implements RouteInterface
 	 */
 	public function matchHost($host)
 	{
-		if (!$this->host) {
+		if (!$this->getHost()) {
 			return true;
 		}
 
-		if (preg_match($this->compile($this->host, $this->defaults, $this->requisites, "host"), $host, $matches)) {
+		if (preg_match($this->compile($this->getHost(), $this->defaults, $this->requisites, "host"), $host, $matches)) {
 			// add matches in array to know variables in host name
 			foreach ($matches as $var => $value) {
 				if (!is_int($var) and $value) {
@@ -417,7 +415,7 @@ class Route implements RouteInterface
 	 * @return string|false False will be returned if the URI cannot be build,
 	 *                      typically when parameter which has no default value is not given
 	 */
-	public function build(array $parameters = array(), $pathType = self::PATH_ONLY)
+	public function build(array $parameters = array(), $pathType = self::PATH_AUTO)
 	{
 		$pattern = $this->path;
 		$requisites = $this->requisites;
@@ -473,6 +471,18 @@ class Route implements RouteInterface
 		}
 
 		$path = "/".trim(str_replace("//", "/", $pattern), "/");
+
+		if ($pathType == self::PATH_AUTO) {
+			if (!empty($parameters["_host"]) or $this->getHost()) {
+				if (!empty($parameters["_scheme"]) or $this->getScheme()) {
+					$pathType = self::PATH_FULL;
+				} else {
+					$pathType = self::PATH_NETWORK;
+				}
+			} else {
+				$pathType = self::PATH_ONLY;
+			}
+		}
 
 		if ($pathType == self::PATH_NETWORK or $pathType == self::PATH_FULL) {
 			if (isset($parameters["_host"])) $host = $parameters["_host"];

@@ -11,6 +11,14 @@ namespace SugiPHP\Routing;
 interface RouteInterface
 {
 	/**
+	 * Generates path only, full path or network path, based on the given parameters.
+	 * If in the $parameters _host and _scheme keys are given then Full URL will be returned.
+	 * If only _host key is given then network address will be returned
+	 * If host and scheme can be also set with setHost() and setScheme() methods.
+	 */
+	const PATH_AUTO = "auto";
+
+	/**
 	 * Generates path only.
 	 * Example: /foo/bar
 	 */
@@ -46,5 +54,5 @@ interface RouteInterface
 	 * @param  array $parameters
 	 * @return string
 	 */
-	public function build(array $parameters = array(), $pathType = self::PATH_ONLY);
+	public function build(array $parameters = array(), $pathType = self::PATH_AUTO);
 }
