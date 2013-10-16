@@ -19,7 +19,9 @@ namespace SugiPHP\Routing;
 class Route implements RouteInterface
 {
 	protected $path = "/";
+	protected $host = null; // null means all
 	protected $method = null; // null means all - GET, HEADER, POST, PUT, DELETE, ...
+	protected $scheme = null; // null means all - http, https
 	protected $defaults = array();
 	protected $requisites = array();
 	protected $variables = array();
@@ -204,7 +206,7 @@ class Route implements RouteInterface
 		// 	$host = "http://" . $host;
 		// }
 		// $host = parse_url($host,  PHP_URL_HOST);
-		$this->defaults["_host"] = $host ?: null;
+		$this->host = $host ?: null;
 
 		return $this;
 	}
@@ -216,7 +218,7 @@ class Route implements RouteInterface
 	 */
 	public function getHost()
 	{
-		return $this->getDefault("_host");
+		return $this->host;
 	}
 
 	/**
@@ -253,7 +255,7 @@ class Route implements RouteInterface
 		if (!in_array(strtolower($scheme), array("", "http", "https"))) {
 			$scheme = null;
 		}
-		$this->defaults["_scheme"] = $scheme ?: null;
+		$this->scheme = $scheme ?: null;
 
 		return $this;
 	}
@@ -265,7 +267,7 @@ class Route implements RouteInterface
 	 */
 	public function getScheme()
 	{
-		return $this->getDefault("_scheme");
+		return $this->scheme;
 	}
 
 	/**
@@ -473,8 +475,8 @@ class Route implements RouteInterface
 		$path = "/".trim(str_replace("//", "/", $pattern), "/");
 
 		if ($pathType == self::PATH_AUTO) {
-			if (!empty($parameters["_host"]) or $this->getHost()) {
-				if (!empty($parameters["_scheme"]) or $this->getScheme()) {
+			if (!empty($parameters["_host"])) {
+				if (!empty($parameters["_scheme"])) {
 					$pathType = self::PATH_FULL;
 				} else {
 					$pathType = self::PATH_NETWORK;

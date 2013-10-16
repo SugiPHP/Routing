@@ -190,7 +190,19 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "")));
 	}
 
-	public function testFullPath()
+	public function buildAutoPathType()
+	{
+		$route = new Route("test", new Route("/", array()));
+		$this->assertSame("/", $route->build("test", array(), Route::PATH_AUTO));
+		$this->assertSame("/", $route->build("test", array("_scheme" => "http"), Route::PATH_AUTO));
+		$this->assertSame("//example.com/", $route->build("test", array("_host" => "example.com"), Route::PATH_AUTO));
+		$this->assertSame("http://example.com/", $route->build("test", array("_host" => "example.com", "_scheme" => "http"), Route::PATH_AUTO));
+		$this->assertSame("https://example.com/", $route->build("test", array("_host" => "example.com", "_scheme" => "https"), Route::PATH_AUTO));
+		// check default is Route::PATH_AUTO
+		$this->assertSame("https://example.com/", $route->build("test", array("_host" => "example.com", "_scheme" => "https")));
+	}
+
+	public function testSpecificPathTypes()
 	{
 		$route = new Route("/");
 		$this->assertEquals("/", $route->build(array(), Route::PATH_NETWORK));

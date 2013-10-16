@@ -58,18 +58,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame("/", $router->build("mvc", ["controller" => "home"]));
 	}
 
-	public function testBuildMagic()
-	{
-		$router = new Router();
-		$router->add("test", new Route("/", array()));
-		$this->assertSame("/", $router->build("test", array(), Route::PATH_AUTO));
-		$this->assertSame("/", $router->build("test", array("_scheme" => "http"), Route::PATH_AUTO));
-		$this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com"), Route::PATH_AUTO));
-		$this->assertSame("http://example.com/", $router->build("test", array("_host" => "example.com", "_scheme" => "http"), Route::PATH_AUTO));
-		$this->assertSame("https://example.com/", $router->build("test", array("_host" => "example.com", "_scheme" => "https"), Route::PATH_AUTO));
-	}
-
-	public function testBuildFullPath()
+	public function testBuildWithPathType()
 	{
 		$router = new Router();
 		$router->add("test", new Route("/", array()));
@@ -98,7 +87,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame("//example.net/", $router->build("test", array(), Route::PATH_NETWORK));
 		$this->assertSame("//example.net/", $router->build("test", array(), Route::PATH_FULL));
 
-		// with setHost and _host
+		// with setHost() and _host
 		$this->assertSame("/", $router->build("test", array("_host" => "example.com"), Route::PATH_ONLY));
 		$this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com"), Route::PATH_NETWORK));
 		$this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com"), Route::PATH_FULL));
