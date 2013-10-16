@@ -38,14 +38,14 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("/show/test", $route->build(array("slug" => "test")));
 		$this->assertEquals("/show/12", $route->build(array("slug" => "12")));
 		// will not be build
-		$this->assertFalse($route->build(array("slug" => "")));		
+		$this->assertFalse($route->build(array("slug" => "")));
 		$this->assertFalse($route->build(array("slug" => "index.php")));
 
 		$route = new Route("/{slug}/view");
 		$this->assertEquals("/test/view", $route->build(array("slug" => "test")));
 		$this->assertEquals("/12/view", $route->build(array("slug" => "12")));
 		// will not be build
-		$this->assertFalse($route->build(array("slug" => "")));		
+		$this->assertFalse($route->build(array("slug" => "")));
 		$this->assertFalse($route->build(array("slug" => "index.php")));
 	}
 
@@ -190,4 +190,23 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("/view", $route->build(array("lang" => "en", "slug" => "")));
 	}
 
+	public function testFullPath()
+	{
+		$route = new Route("/");
+		$this->assertEquals("/", $route->build(array(), Route::PATH_NETWORK));
+		$this->assertEquals("//example.com/", $route->build(array("_host" => "example.com"), Route::PATH_NETWORK));
+		$this->assertEquals("//example.com/", $route->build(array("_host" => "example.com"), Route::PATH_FULL));
+		$this->assertEquals("http://example.com/", $route->build(array("_host" => "example.com", "_scheme" => "http"), Route::PATH_FULL));
+		$this->assertEquals("https://example.com/", $route->build(array("_host" => "example.com", "_scheme" => "https"), Route::PATH_FULL));
+
+		$route = new Route("/");
+		$route->setHost("example.com");
+		$this->assertEquals("//example.com/", $route->build(array(), Route::PATH_NETWORK));
+		$this->assertEquals("//localhost/", $route->build(array("_host" => "localhost"), Route::PATH_FULL));
+		$route->setScheme("http");
+		$this->assertEquals("http://example.com/", $route->build(array(), Route::PATH_FULL));
+		$this->assertEquals("https://example.com/", $route->build(array("_scheme" => "https"), Route::PATH_FULL));
+		$this->assertEquals("/", $route->build(array("_scheme" => "https"), Route::PATH_ONLY));
+		$this->assertEquals("https://localhost/", $route->build(array("_host" => "localhost", "_scheme" => "https"), Route::PATH_FULL));
+	}
 }

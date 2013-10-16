@@ -413,9 +413,11 @@ class Route implements RouteInterface
 	 * thus making a more friendly URL.
 	 *
 	 * @param  array  $parameters
-	 * @return string
+	 * @param  string Which parts of the path should be used: PATH_ONLY, PATH_FULL, PATH_NETWORK
+	 * @return string|false False will be returned if the URI cannot be build,
+	 *                      typically when parameter which has no default value is not given
 	 */
-	public function build(array $parameters = array())
+	public function build(array $parameters = array(), $pathType = self::PATH_ONLY)
 	{
 		$pattern = $this->path;
 		$requisites = $this->requisites;
@@ -470,7 +472,24 @@ class Route implements RouteInterface
 			}
 		}
 
-		return "/".trim(str_replace("//", "/", $pattern), "/");
+		$path = "/".trim(str_replace("//", "/", $pattern), "/");
+
+		if ($pathType == self::PATH_NETWORK or $pathType == self::PATH_FULL) {
+			if (isset($parameters["_host"])) $host = $parameters["_host"];
+			else $host = $this->getHost();
+			if ($host) {
+				$path = "//" . $host . $path;
+			}
+		}
+		if ($pathType == self::PATH_FULL and $host) {
+			if (isset($parameters["_scheme"])) $scheme = $parameters["_scheme"];
+			else $scheme = $this->getScheme();
+			if ($scheme) {
+				$path = $scheme . ":" . $path;
+			}
+		}
+
+		return $path;
 	}
 
 	/**
@@ -489,7 +508,7 @@ class Route implements RouteInterface
 	 *
 	 * @param  string $pattern
 	 * @param  array  $defaults
-	 * @param  arrat  $requisites
+	 * @param  array  $requisites
 	 * @param  string $style - "host" or "path"
 	 * @return string
 	 */

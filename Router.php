@@ -181,12 +181,12 @@ class Router implements \Countable, \IteratorAggregate
 	 * @param  array  $params
 	 * @return string|null Will return URI or NULL if the route is not found
 	 */
-	public function build($name, $params = array())
+	public function build($name, $params = array(), $pathType = Route::PATH_ONLY)
 	{
 		if (!$route = $this->get($name)) {
 			return null;
 		}
 
-		return $route->build($params);
+		return $route->build($params, $pathType);
 	}
 }
