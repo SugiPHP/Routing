@@ -427,12 +427,7 @@ class Route implements RouteInterface
 		preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
 		$cnt = count($matches);
 		while ($cnt--) {
-			$match = $matches[$cnt];
-			$variable = $match[1][0];
-			$varPattern = $match[0][0]; // {variable}
-			$varPos = $match[0][1];
-			$nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
-			$prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
+			$variable = $matches[$cnt][1][0];
 			$param = empty($parameters[$variable]) ? null : $parameters[$variable];
 			$default = array_key_exists($variable, $defaults) ? $defaults[$variable] : null;
 			$requisite = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
@@ -462,7 +457,7 @@ class Route implements RouteInterface
 				return false;
 			}
 
-			$pattern = str_replace($varPattern, $replace, $pattern);
+			$pattern = str_replace($matches[$cnt][0][0], $replace, $pattern);
 			if (!$replace) {
 				if ($variable == "_format") {
 					$pattern = rtrim($pattern, ".");
@@ -487,17 +482,15 @@ class Route implements RouteInterface
 		}
 
 		if ($pathType == self::PATH_NETWORK or $pathType == self::PATH_FULL) {
-			if (isset($parameters["_host"])) $host = $parameters["_host"];
-			else $host = $this->getHost();
-			if ($host) {
-				$path = "//" . $host . $path;
-			}
-		}
-		if ($pathType == self::PATH_FULL and $host) {
-			if (isset($parameters["_scheme"])) $scheme = $parameters["_scheme"];
-			else $scheme = $this->getScheme();
-			if ($scheme) {
-				$path = $scheme . ":" . $path;
+			if (isset($parameters["_host"])) {
+				$path = "//" . $parameters["_host"] . $path;
+				if ($pathType == self::PATH_FULL) {
+					if (isset($parameters["_scheme"])) $scheme = $parameters["_scheme"];
+					else $scheme = $this->getScheme();
+					if ($scheme) {
+						$path = $scheme . ":" . $path;
+					}
+				}
 			}
 		}
 
