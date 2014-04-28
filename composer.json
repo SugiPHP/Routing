@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Routing",
     "keywords": ["route"],
-    "licence": "MIT",
+    "license": "MIT",
     "authors": [
         {
             "name": "Plamen Popov",
@@ -14,10 +14,9 @@
         "php": ">=5.3"
     },
     "autoload": {
-        "psr-0": { 
+        "psr-4": {
             "SugiPHP\\Routing\\": ""
         }
     },
-    "target-dir": "SugiPHP/Routing",
     "minimum-stability": "dev"
 }
