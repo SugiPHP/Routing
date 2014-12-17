@@ -312,7 +312,7 @@ class Route implements RouteInterface
 	}
 
 	/**
-	 * Checks the given shceme is within accepted route schemes.
+	 * Checks the given scheme is within accepted route schemes.
 	 *
 	 * @param string $scheme
 	 *
