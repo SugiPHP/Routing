@@ -367,7 +367,7 @@ class Route implements RouteInterface
 		if (preg_match($this->compile($this->getHost(), $this->defaults, $this->requisites, "host"), $host, $matches)) {
 			// add matches in array to know variables in host name
 			foreach ($matches as $var => $value) {
-				if (!is_int($var) and $value) {
+				if (!is_int($var) && $value) {
 					$this->variables[$var] = $value;
 				}
 			}
@@ -408,7 +408,7 @@ class Route implements RouteInterface
 		if (preg_match($regEx, $path, $matches)) {
 			// add matches in array to know variables in path name
 			foreach ($matches as $var => $value) {
-				if (!is_int($var) and $value) {
+				if (!is_int($var) && $value) {
 					$this->variables[$var] = $value;
 				}
 			}
@@ -486,7 +486,7 @@ class Route implements RouteInterface
 			}
 		}
 
-		if ($pathType == self::PATH_NETWORK or $pathType == self::PATH_FULL) {
+		if (($pathType == self::PATH_NETWORK) || ($pathType == self::PATH_FULL)) {
 			if (isset($parameters["_host"])) {
 				$path = "//" . $parameters["_host"] . $path;
 				if ($pathType == self::PATH_FULL) {
