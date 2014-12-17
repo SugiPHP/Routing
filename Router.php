@@ -1,9 +1,10 @@
 <?php
 /**
- * @package    SugiPHP
- * @subpackage Routing
- * @author     Plamen Popov <tzappa@gmail.com>
- * @license    http://opensource.org/licenses/mit-license.php (MIT License)
+ * Router Class
+ *
+ * @package SugiPHP.Routing
+ * @author  Plamen Popov <tzappa@gmail.com>
+ * @license http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
 namespace SugiPHP\Routing;
@@ -22,8 +23,9 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Adds a route to the end of the list.
 	 *
-	 * @param  string $name The route's name
-	 * @param  RouteInterface $route
+	 * @param string $name The route's name
+	 * @param RouteInterface $route
+	 *
 	 * @return Router
 	 */
 	public function add($name, RouteInterface $route)
@@ -40,8 +42,9 @@ class Router implements \Countable, \IteratorAggregate
 	 * Sets a route. If the route with this name already exists in the list it will be set on top of it,
 	 * otherwise it will be added to the end of the list.
 	 *
-	 * @param  string $name The route's name
-	 * @param  RouterInterface $route
+	 * @param string $name The route's name
+	 * @param RouterInterface $route
+	 *
 	 * @return Router
 	 */
 	public function set($name, RouteInterface $route)
@@ -54,7 +57,8 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Returns a route instance by it's name.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return RouteInterface
 	 */
 	public function get($name)
@@ -65,7 +69,8 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Checks the route with this name exists in the list.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return boolean
 	 */
 	public function has($name)
@@ -76,7 +81,8 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Removes route with the name given.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return Router
 	 */
 	public function delete($name)
@@ -110,8 +116,8 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Returns the number of routes in the list.
+	 * implements \Countable
 	 *
-	 * @implements \Countable
 	 * @return integer
 	 */
 	public function count()
@@ -120,7 +126,8 @@ class Router implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * @implements \IteratorAggregate
+	 * Implements \IteratorAggregate
+	 *
 	 * @return array
 	 */
 	public function getIterator()
@@ -132,10 +139,11 @@ class Router implements \Countable, \IteratorAggregate
 	 * Walks through all registered routes and returns first route that matches
 	 * the given parameters.
 	 *
-	 * @param  string $path
-	 * @param  string $method "GET", "POST", "PUT" etc. HTTP methods
-	 * @param  string $host
-	 * @param  string $scheme "http" or "https" scheme
+	 * @param string $path
+	 * @param string $method "GET", "POST", "PUT" etc. HTTP methods
+	 * @param string $host
+	 * @param string $scheme "http" or "https" scheme
+	 *
 	 * @return array|null returns NULL if no route matches given parameters
 	 */
 	public function match($path, $method, $host, $scheme)
@@ -157,6 +165,7 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Continue matching registered routes.
+	 *
 	 * @see match()
 	 *
 	 * @return array|null returns NULL if no route matches given parameters
@@ -177,8 +186,9 @@ class Router implements \Countable, \IteratorAggregate
 	/**
 	 * Builds an URI based on parameters given.
 	 *
-	 * @param  string $name Route name
-	 * @param  array  $params
+	 * @param string $name Route name
+	 * @param array  $params
+	 *
 	 * @return string|null Will return URI or NULL if the route is not found
 	 */
 	public function build($name, $params = array(), $pathType = Route::PATH_AUTO)

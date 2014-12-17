@@ -1,10 +1,9 @@
 <?php
 /**
- * @package    SugiPHP
- * @subpackage Routing
- * @category   tests
- * @author     Plamen Popov <tzappa@gmail.com>
- * @license    http://opensource.org/licenses/mit-license.php (MIT License)
+ * PHP Unit tests for matching routes with some URIs
+ * @package SugiPHP.Routing
+ * @author  Plamen Popov <tzappa@gmail.com>
+ * @license http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
 namespace SugiPHP\Routing;
@@ -24,7 +23,7 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
 		$this->assertInternalType("array", $route->match($url["path"], "GET", $url["host"], $url["scheme"]));
 		$url = parse_url("https://example.com/");
 		$this->assertInternalType("array", $route->match($url["path"], "GET", $url["host"], $url["scheme"]));
-		
+
 		$url = parse_url("http://example.com/test");
 		$this->assertFalse($route->match($url["path"], "GET", $url["host"], $url["scheme"]));
 	}
@@ -34,7 +33,7 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
 		$route = new Route("/users");
 		$url = parse_url("http://example.com/users");
 		$this->assertInternalType("array", $route->match($url["path"], "GET", $url["host"], $url["scheme"]));
-		
+
 		$url = parse_url("http://example.com/test");
 		$this->assertFalse($route->match($url["path"], "GET", $url["host"], $url["scheme"]));
 		$url = parse_url("http://example.com/");

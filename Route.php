@@ -1,9 +1,10 @@
 <?php
 /**
- * @package    SugiPHP
- * @subpackage Routing
- * @author     Plamen Popov <tzappa@gmail.com>
- * @license    http://opensource.org/licenses/mit-license.php (MIT License)
+ * Route class.
+ *
+ * @package SugiPHP.Routing
+ * @author  Plamen Popov <tzappa@gmail.com>
+ * @license http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
 namespace SugiPHP\Routing;
@@ -46,8 +47,9 @@ class Route implements RouteInterface
 	/**
 	 * Set expected path (pattern).
 	 *
-	 * @param  string $path
-	 * @return SugiPHP\Routing\Route
+	 * @param string $path
+	 *
+	 * @return Route
 	 */
 	public function setPath($path)
 	{
@@ -74,8 +76,9 @@ class Route implements RouteInterface
 	 * Sets default values for variables in host and
 	 * in the path (pattern) and thus making them optional.
 	 *
-	 * @param  array $defaults
-	 * @return SugiPHP\Routing\Route
+	 * @param array $defaults
+	 *
+	 * @return Route
 	 */
 	public function setDefaults(array $defaults)
 	{
@@ -87,9 +90,10 @@ class Route implements RouteInterface
 	/**
 	 * Sets a default value for a parameter $key.
 	 *
-	 * @param  string $key
-	 * @param  string $value
-	 * @return SugiPHP\Routing\Route
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return Route
 	 */
 	public function setDefault($key, $value)
 	{
@@ -111,7 +115,8 @@ class Route implements RouteInterface
 	/**
 	 * Returns a default value for a given parameter $key.
 	 *
-	 * @param  string $key
+	 * @param string $key
+	 *
 	 * @return string|null - null means that no default parameter was set
 	 */
 	public function getDefault($key)
@@ -122,7 +127,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks a default value is set.
 	 *
-	 * @param  string $key
+	 * @param string $key
+	 *
 	 * @return boolean
 	 */
 	public function hasDefault($key)
@@ -136,8 +142,9 @@ class Route implements RouteInterface
 	 *  array("lang" => "en|bg");
 	 * </code>
 	 *
-	 * @param  array $requisites
-	 * @return SugiPHP\Routing\Route
+	 * @param array $requisites
+	 *
+	 * @return Route
 	 */
 	public function setRequisites(array $requisites)
 	{
@@ -149,9 +156,10 @@ class Route implements RouteInterface
 	/**
 	 * Sets a requisite - regular expression for a $key path or host variable.
 	 *
-	 * @param  string $key
-	 * @param  string $value
-	 * @return SugiPHP\Routing\Route
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return Route
 	 */
 	public function setRequisite($key, $value)
 	{
@@ -173,7 +181,8 @@ class Route implements RouteInterface
 	/**
 	 * Returns a requisite (RegEx) for a path or host variable $key.
 	 *
-	 * @param  string $key
+	 * @param string $key
+	 *
 	 * @return stting|null - null means no RegEx is set
 	 */
 	public function getRequisite($key)
@@ -184,7 +193,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks a requisite is set for the host or path parameter $key.
 	 *
-	 * @param  string  $key
+	 * @param string  $key
+	 *
 	 * @return boolean
 	 */
 	public function hasRequisite($key)
@@ -195,8 +205,9 @@ class Route implements RouteInterface
 	/**
 	 * Sets expected host (pattern)
 	 *
-	 * @param  string $host
-	 * @return SugiPHP\Routing\Route
+	 * @param string $host
+	 *
+	 * @return Route
 	 */
 	public function setHost($host)
 	{
@@ -224,8 +235,9 @@ class Route implements RouteInterface
 	/**
 	 * Set request methods for which the Route should work.
 	 *
-	 * @param  string|null $method - null matches any method
-	 * @return SugiPHP\Routing\Route
+	 * @param string|null $method - null matches any method
+	 *
+	 * @return Route
 	 */
 	public function setMethod($method)
 	{
@@ -247,8 +259,9 @@ class Route implements RouteInterface
 	/**
 	 * Expected HTTP scheme: "http" or "https"
 	 *
-	 * @param  string|null $scheme - null means all
-	 * @return SugiPHP\Routing\Route
+	 * @param string|null $scheme - null means all
+	 *
+	 * @return Route
 	 */
 	public function setScheme($scheme)
 	{
@@ -271,13 +284,9 @@ class Route implements RouteInterface
 	}
 
 	/**
-	 * Match defined route rules against the request.
+	 * Implements RouteInterface::match() method
 	 *
-	 * @param  string $path - "/"
-	 * @param  string $method - "GET", "POST", etc.
-	 * @param  string $host - "example.com"
-	 * @param  string $scheme - "http" or "https"
-	 * @return array|false - true if the request match defined route, false if there is no match
+	 * {@inheritdoc}
 	 */
 	public function match($path, $method, $host, $scheme)
 	{
@@ -306,7 +315,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks the given shceme is within accepted route schemes.
 	 *
-	 * @param  string $scheme
+	 * @param string $scheme
+	 *
 	 * @return boolean
 	 */
 	public function matchScheme($scheme)
@@ -329,7 +339,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks the given method is within those registered in the Route.
 	 *
-	 * @param  string $method - "GET", "POST", "HEAD", etc.
+	 * @param string $method - "GET", "POST", "HEAD", etc.
+	 *
 	 * @return boolean
 	 */
 	public function matchMethod($method)
@@ -344,7 +355,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks the given host matches route's host.
 	 *
-	 * @param  string $host - like "sub.example.com"
+	 * @param string $host - like "sub.example.com"
+	 *
 	 * @return boolean
 	 */
 	public function matchHost($host)
@@ -369,7 +381,8 @@ class Route implements RouteInterface
 	/**
 	 * Checks that given path matches root's path.
 	 *
-	 * @param  string $path
+	 * @param string $path
+	 *
 	 * @return boolean
 	 */
 	public function matchPath($path)
@@ -407,15 +420,9 @@ class Route implements RouteInterface
 	}
 
 	/**
-	 * Builds an URI based on the pattern, default values and given parameters.
-	 * If some parameter is not set the default value will be used.
-	 * If some parameters are equal to their default values they can be skipped,
-	 * thus making a more friendly URL.
+	 * Implements RouteInterface::build() method
 	 *
-	 * @param  array  $parameters
-	 * @param  string Which parts of the path should be used: PATH_ONLY, PATH_FULL, PATH_NETWORK
-	 * @return string|false False will be returned if the URI cannot be build,
-	 *                      typically when parameter which has no default value is not given
+	 * {@inheritdoc}
 	 */
 	public function build(array $parameters = array(), $pathType = self::PATH_AUTO)
 	{
@@ -432,11 +439,11 @@ class Route implements RouteInterface
 			$default = array_key_exists($variable, $defaults) ? $defaults[$variable] : null;
 			$requisite = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
 
-			if ($param and !preg_match("#^".$requisite."$#", $param)) {
+			if ($param && !preg_match("#^".$requisite."$#", $param)) {
 				return false;
 			}
 
-			if (!is_null($default) and !is_null($param)) {
+			if (!is_null($default) && !is_null($param)) {
 				// if the given param value is equal to the default value for that parameter we'll leave it empty
 				if ($param == $default) {
 					$replace = "";
@@ -485,8 +492,7 @@ class Route implements RouteInterface
 			if (isset($parameters["_host"])) {
 				$path = "//" . $parameters["_host"] . $path;
 				if ($pathType == self::PATH_FULL) {
-					if (isset($parameters["_scheme"])) $scheme = $parameters["_scheme"];
-					else $scheme = $this->getScheme();
+					$scheme =  (isset($parameters["_scheme"])) ? $scheme = $parameters["_scheme"] : $scheme = $this->getScheme();
 					if ($scheme) {
 						$path = $scheme . ":" . $path;
 					}
@@ -500,7 +506,8 @@ class Route implements RouteInterface
 	/**
 	 * Returns variable $var.
 	 *
-	 * @param  string $var
+	 * @param string $var
+	 *
 	 * @return string
 	 */
 	public function get($var)
@@ -511,10 +518,11 @@ class Route implements RouteInterface
 	/**
 	 * Create regular expression for the host or for the path
 	 *
-	 * @param  string $pattern
-	 * @param  array  $defaults
-	 * @param  array  $requisites
-	 * @param  string $style - "host" or "path"
+	 * @param string $pattern
+	 * @param array  $defaults
+	 * @param array  $requisites
+	 * @param string $style - "host" or "path"
+	 *
 	 * @return string
 	 */
 	protected function compile($pattern, $defaults, $requisites, $style)

@@ -1,10 +1,10 @@
 <?php
 /**
- * @package    SugiPHP
- * @subpackage Routing
- * @category   tests
- * @author     Plamen Popov <tzappa@gmail.com>
- * @license    http://opensource.org/licenses/mit-license.php (MIT License)
+ * PHP Unit tests for Route class
+ *
+ * @package SugiPHP.Routing
+ * @author  Plamen Popov <tzappa@gmail.com>
+ * @license http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
 namespace SugiPHP\Routing;
@@ -60,7 +60,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		// absolute valid
 		$route = new Route("/home.php");
 		$this->assertEquals("/home.php", $route->getPath());
-		
+
 		// tries to fix wrong input
 		// This is not the right thing to do,
 		// so I'm removing it from the code!
@@ -76,13 +76,13 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		// no fix for this!!!
 		$route = new Route("www.example.com/home");
 		$this->assertEquals("/www.example.com/home", $route->getPath());
-		
+
 		// this is better
 		$route = new Route("http://www.example.com/home");
 		$this->assertEquals("/home", $route->getPath());
 		// but will NOT set host
 		$this->assertEquals("", $route->getHost());
-*/		
+*/
 	}
 
 	public function testSegmentsInPath()
@@ -208,7 +208,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($route->matchPath("/otherpathpath"));
 		$this->assertFalse($route->matchPath("/"));
 	}
-	
+
 	public function testMatchLongPath()
 	{
 		$route = new Route("/path/to/file.html");
@@ -233,7 +233,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
 		// NOTE: this might be changed
 		$this->assertFalse($route->matchPath("/path/to/file.html"));
-	
+
 		// false
 		$this->assertFalse($route->matchPath("/path/to"));
 		$this->assertFalse($route->matchPath("/path/to/"));
@@ -272,7 +272,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 	public function testMatchPathVariableAndDot()
 	{
 		$route = new Route("/path/to/file{ext}", array("ext" => ""));
-		
+
 		$this->assertTrue($route->matchPath("/path/to/filephp"));
 		$this->assertTrue($route->matchPath("/path/to/file"));
 		// false
@@ -286,7 +286,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($route->matchPath("/path/to/file"));
 		// fails
 		$this->assertFalse($route->matchPath("/path/to/filephp"));
-		$this->assertFalse($route->matchPath("/path/to/file.")); 
+		$this->assertFalse($route->matchPath("/path/to/file."));
 	}
 
 	public function testMatchPathWithSpecialFormat()
@@ -378,12 +378,12 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$route->setHost(null);
 		$this->assertEquals("", $route->getHost());
 		$this->assertSame(null, $route->getHost());
-		
+
 		// wrong but will be fixed
 		// EDIT: this will not be fixed!
 		// $route->setHost("http://example.com/users/list?page=1");
 		// $this->assertEquals("example.com", $route->getHost());
-		
+
 		// sub domain
 		$route->setHost("sub.example.com");
 		$this->assertEquals("sub.example.com", $route->getHost());
@@ -398,7 +398,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$route = new Route("/");
 		$this->assertTrue($route->matchHost("example.com"));
 		$this->assertTrue($route->matchHost("sub.example.com"));
-		
+
 		$route->setHost("example.com");
 		$this->assertTrue($route->matchHost("example.com"));
 		$this->assertFalse($route->matchHost("www.example.com"));

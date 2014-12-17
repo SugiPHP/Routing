@@ -1,9 +1,10 @@
 <?php
 /**
- * @package    SugiPHP
- * @subpackage Routing
- * @author     Plamen Popov <tzappa@gmail.com>
- * @license    http://opensource.org/licenses/mit-license.php (MIT License)
+ * A collection of routes.
+ *
+ * @package SugiPHP.Routing
+ * @author  Plamen Popov <tzappa@gmail.com>
+ * @license http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
 namespace SugiPHP\Routing;
@@ -20,8 +21,9 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	/**
 	 * Adds a route to the end of the list.
 	 *
-	 * @param  string $name The route's name
-	 * @param  RouteInterface $route
+	 * @param string $name The route's name
+	 * @param RouteInterface $route
+	 *
 	 * @return Router
 	 */
 	public function add($name, RouteInterface $route)
@@ -38,8 +40,9 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	 * Sets a route. If the route with this name already exists in the list it will be set on top of it,
 	 * otherwise it will be added to the end of the list.
 	 *
-	 * @param  string $name The route's name
-	 * @param  RouterInterface $route
+	 * @param string $name The route's name
+	 * @param RouterInterface $route
+	 *
 	 * @return Router
 	 */
 	public function set($name, RouteInterface $route)
@@ -52,7 +55,8 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	/**
 	 * Returns a route instance by it's name.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return RouteInterface
 	 */
 	public function get($name)
@@ -63,7 +67,8 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	/**
 	 * Checks the route with this name exists in the list.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return boolean
 	 */
 	public function has($name)
@@ -74,7 +79,8 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	/**
 	 * Removes route with the name given.
 	 *
-	 * @param  string $name
+	 * @param string $name
+	 *
 	 * @return Router
 	 */
 	public function delete($name)
@@ -108,8 +114,8 @@ class RouteCollection implements \Countable, \IteratorAggregate
 
 	/**
 	 * Returns the number of routes in the list.
+	 * Implements \Countable
 	 *
-	 * @implements \Countable
 	 * @return integer
 	 */
 	public function count()
@@ -118,7 +124,8 @@ class RouteCollection implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * @implements \IteratorAggregate
+	 * Implements \IteratorAggregate
+	 *
 	 * @return array
 	 */
 	public function getIterator()
