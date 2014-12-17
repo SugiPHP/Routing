@@ -285,7 +285,6 @@ class Route implements RouteInterface
 
 	/**
 	 * Implements RouteInterface::match() method
-	 *
 	 * {@inheritdoc}
 	 */
 	public function match($path, $method, $host, $scheme)
@@ -421,7 +420,6 @@ class Route implements RouteInterface
 
 	/**
 	 * Implements RouteInterface::build() method
-	 *
 	 * {@inheritdoc}
 	 */
 	public function build(array $parameters = array(), $pathType = self::PATH_AUTO)
