@@ -146,6 +146,40 @@ class Router implements \Countable, \IteratorAggregate
 	 *
 	 * @return array|null returns NULL if no route matches given parameters
 	 */
+	public function getFirstMatch($path, $method = "", $host = "", $scheme = "")
+	{
+		if ($match = $this->match($path, $method, $host, $scheme)) {
+			return $this->get($match["_name"]);
+		}
+	}
+
+	/**
+	 * Continue matching registered routes.
+	 *
+	 * @see getFirstMatch()
+	 *
+	 * @return Route or NULL if no route matches given parameters
+	 */
+	public function getNextMatch()
+	{
+		if ($match = $this->matchNext()) {
+			return $this->get($match["_name"]);
+		}
+	}
+
+	/**
+	 * Walks through all registered routes and returns first route that matches
+	 * the given parameters.
+	 *
+	 * @deprecated use getFirstMatch() which will return Route instead of array
+	 *
+	 * @param string $path
+	 * @param string $method "GET", "POST", "PUT" etc. HTTP methods
+	 * @param string $host
+	 * @param string $scheme "http" or "https" scheme
+	 *
+	 * @return array|null returns NULL if no route matches given parameters
+	 */
 	public function match($path, $method, $host, $scheme)
 	{
 		$this->checkedRoutes = array();
@@ -165,6 +199,8 @@ class Router implements \Countable, \IteratorAggregate
 
 	/**
 	 * Continue matching registered routes.
+	 *
+	 * @deprecated use getNextMatch() which will return Route instead of array
 	 *
 	 * @see match()
 	 *
