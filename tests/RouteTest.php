@@ -231,9 +231,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchPath("/path/to/fi_le"));
         $this->assertTrue($route->matchPath("/path/to/fi_le1234"));
 
-        // NOTE: this might be changed
-        $this->assertFalse($route->matchPath("/path/to/file.html"));
-
         // false
         $this->assertFalse($route->matchPath("/path/to"));
         $this->assertFalse($route->matchPath("/path/to/"));
@@ -258,7 +255,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchPath("/path/to"));
         $this->assertTrue($route->matchPath("/path/to/file"));
         $this->assertTrue($route->matchPath("/path/to/index"));
-        $this->assertFalse($route->matchPath("/path/to/index.php"));
+        $this->assertTrue($route->matchPath("/path/to/index.php"));
 
         $route = new Route("/path/to/{file}", array("file" => ""));
         // ok
@@ -266,7 +263,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchPath("/path/to"));
         $this->assertTrue($route->matchPath("/path/to/file"));
         $this->assertTrue($route->matchPath("/path/to/index"));
-        $this->assertFalse($route->matchPath("/path/to/index.php"));
+        $this->assertTrue($route->matchPath("/path/to/index.php"));
     }
 
     public function testMatchPathVariableAndDot()
@@ -275,12 +272,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matchPath("/path/to/filephp"));
         $this->assertTrue($route->matchPath("/path/to/file"));
-        // false
-        $this->assertFalse($route->matchPath("/path/to/file."));
-        $this->assertFalse($route->matchPath("/path/to/file.php"));
 
         // add a requirement
-        $route->setRequisite("ext", "\.\w{2,4}");
+        $route->setRequisite("ext", "\.\w{2,3}");
 
         $this->assertTrue($route->matchPath("/path/to/file.php"));
         $this->assertTrue($route->matchPath("/path/to/file"));

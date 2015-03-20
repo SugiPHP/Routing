@@ -30,23 +30,23 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
         $route = new Route("/{slug}");
         $this->assertEquals("/test", $route->build(array("slug" => "test")));
         $this->assertEquals("/12", $route->build(array("slug" => "12")));
+        $this->assertEquals("/index.php", $route->build(array("slug" => "index.php")));
         // will not be build
         $this->assertFalse($route->build(array("slug" => "")));
-        $this->assertFalse($route->build(array("slug" => "index.php")));
 
         $route = new Route("/show/{slug}");
         $this->assertEquals("/show/test", $route->build(array("slug" => "test")));
         $this->assertEquals("/show/12", $route->build(array("slug" => "12")));
+        $this->assertEquals("/show/index.php", $route->build(array("slug" => "index.php")));
         // will not be build
         $this->assertFalse($route->build(array("slug" => "")));
-        $this->assertFalse($route->build(array("slug" => "index.php")));
 
         $route = new Route("/{slug}/view");
         $this->assertEquals("/test/view", $route->build(array("slug" => "test")));
         $this->assertEquals("/12/view", $route->build(array("slug" => "12")));
+        $this->assertEquals("/index.php/view", $route->build(array("slug" => "index.php")));
         // will not be build
         $this->assertFalse($route->build(array("slug" => "")));
-        $this->assertFalse($route->build(array("slug" => "index.php")));
     }
 
     public function testBuildWithOneParamAndDefaultEmptyValue()
@@ -56,23 +56,18 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("/12", $route->build(array("slug" => "12")));
         $this->assertEquals("/", $route->build(array()));
         $this->assertEquals("/", $route->build(array("slug" => "")));
-        // will not be build
-        $this->assertFalse($route->build(array("slug" => "index.php")));
+        $this->assertEquals("/index.php", $route->build(array("slug" => "index.php")));
 
         $route = new Route("/show/{slug}", array("slug" => ""));
         $this->assertEquals("/show/foo", $route->build(array("slug" => "foo")));
         $this->assertEquals("/show/12", $route->build(array("slug" => 12)));
         $this->assertEquals("/show", $route->build(array("slug" => "")));
         $this->assertEquals("/show", $route->build());
-        // will not be build
-        $this->assertFalse($route->build(array("slug" => "index.php")));
 
         $route = new Route("/{lang}/view", array("lang" => ""));
         $this->assertEquals("/en/view", $route->build(array("lang" => "en")));
         $this->assertEquals("/view", $route->build(array("lang" => "")));
         $this->assertEquals("/view", $route->build());
-        // will not be build
-        $this->assertFalse($route->build(array("lang" => "index.php")));
     }
 
     public function testBuildWithOneParamAndDefaultNotEmptyValue()
@@ -82,22 +77,16 @@ class UrlBuildTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("/12", $route->build(array("slug" => "12")));
         $this->assertEquals("/", $route->build());
         $this->assertEquals("/", $route->build(array("slug" => "")));
-        // will not be build
-        $this->assertFalse($route->build(array("slug" => "index.php")));
 
         $route = new Route("/show/{slug}", array("slug" => "foo"));
         $this->assertEquals("/show", $route->build(array("slug" => "foo")));
         $this->assertEquals("/show/12", $route->build(array("slug" => 12)));
         $this->assertEquals("/show", $route->build(array("slug" => "")));
-        // will not be build
-        $this->assertFalse($route->build(array("slug" => "index.php")));
 
         $route = new Route("/{lang}/view", array("lang" => "en"));
         $this->assertEquals("/bg/view", $route->build(array("lang" => "bg")));
         $this->assertEquals("/view", $route->build(array("lang" => "")));
         $this->assertEquals("/view", $route->build(array()));
-        // will not be build
-        $this->assertFalse($route->build(array("lang" => "en.bg")));
 
         $route = new Route("/show/{site}/list", array("site" => "main"));
         $this->assertEquals("/show/list", $route->build(array("site" => "main")));
