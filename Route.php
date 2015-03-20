@@ -26,8 +26,6 @@ class Route implements RouteInterface
     protected $requisites = array();
     protected $variables = array();
 
-    protected $defaultPathRequisites = "[^/,;?<>]+";
-
     /**
      * Constructor
      *
@@ -361,7 +359,7 @@ class Route implements RouteInterface
             return true;
         }
 
-        if (preg_match($this->compile($this->getHost(), $this->defaults, $this->requisites, "host"), $host, $matches)) {
+        if (preg_match(HostCompiler::compile($this->getHost(), $this->defaults, $this->requisites), $host, $matches)) {
             // add matches in array to know variables in host name
             foreach ($matches as $var => $value) {
                 if (!is_int($var) && $value) {
@@ -400,7 +398,7 @@ class Route implements RouteInterface
             $routePath = $this->path;
         }
 
-        $regEx = $this->compile($routePath, $this->defaults, $requisites, "path");
+        $regEx = PathCompiler::compile($routePath, $this->defaults, $requisites);
 
         if (preg_match($regEx, $path, $matches)) {
             // add matches in array to know variables in path name
@@ -421,54 +419,7 @@ class Route implements RouteInterface
      */
     public function build(array $parameters = array(), $pathType = self::PATH_AUTO)
     {
-        $pattern = $this->path;
-        $requisites = $this->requisites;
-        $defaults = $this->defaults;
-        $defaultRequisites = $this->defaultPathRequisites;
-
-        preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
-        $cnt = count($matches);
-        while ($cnt--) {
-            $variable = $matches[$cnt][1][0];
-            $param = empty($parameters[$variable]) ? null : $parameters[$variable];
-            $default = array_key_exists($variable, $defaults) ? $defaults[$variable] : null;
-            $requisite = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
-
-            if ($param && !preg_match("#^".$requisite."$#", $param)) {
-                return false;
-            }
-
-            if (!is_null($default) && !is_null($param)) {
-                // if the given param value is equal to the default value for that parameter we'll leave it empty
-                if ($param == $default) {
-                    $replace = "";
-                } elseif ($param) {
-                    $replace = $param;
-                } else {
-                    $replace = $default;
-                }
-            } elseif (!is_null($param)) {
-                if (!$param) {
-                    return false;
-                }
-                $replace = $param;
-            } elseif (!is_null($default)) {
-                $replace = "";
-            } else {
-                return false;
-            }
-
-            $pattern = str_replace($matches[$cnt][0][0], $replace, $pattern);
-            if (!$replace) {
-                if ($variable == "_format") {
-                    $pattern = rtrim($pattern, ".");
-                } else {
-                    $pattern = rtrim($pattern, "/");
-                }
-            }
-        }
-
-        $path = "/".trim(str_replace("//", "/", $pattern), "/");
+        $path = PathCompiler::build($this->path, $parameters, $this->defaults, $this->requisites);
 
         if ($pathType == self::PATH_AUTO) {
             if (!empty($parameters["_host"])) {
@@ -507,67 +458,5 @@ class Route implements RouteInterface
     public function get($var)
     {
         return isset($this->variables[$var]) ? $this->variables[$var] : null;
-    }
-
-    /**
-     * Create regular expression for the host or for the path
-     *
-     * @param string $pattern
-     * @param array  $defaults
-     * @param array  $requisites
-     * @param string $style - "host" or "path"
-     *
-     * @return string
-     */
-    protected function compile($pattern, $defaults, $requisites, $style)
-    {
-        $regex = $pattern;
-        // $regex = preg_replace('#[.\\+?[^\\]$()<>=!]#', '\\\\$0', $regex);
-
-        if ($style === "host") {
-            $delimiter = ".";
-            $defaultRequisites = "[^.,;?<>]+";
-        } elseif ($style === "path") {
-            $delimiter = "/";
-            $defaultRequisites = $this->defaultPathRequisites;
-        } else {
-            throw new \Exception("Unknown style $style");
-        }
-
-        preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
-        if (is_array($matches)) {
-            foreach ($matches as $match) {
-                $variable = $match[1][0];
-                $varPattern = $match[0][0]; // {variable}
-                $varPos = $match[0][1];
-                $capture = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
-                $nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
-                $prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
-
-                if (array_key_exists($variable, $defaults)) {
-                    // Make variables that have default values optional
-                    // Also make delimiter (if next char is a delimiter) to be also optional
-                    if ($style == "host" and $nextChar == $delimiter and ($prevChar == "" or $prevChar == $delimiter)) {
-                        $regex = preg_replace("#".$varPattern.$delimiter."#", "((?P<".$variable.">".$capture.")".$delimiter.")?", $regex);
-                    } elseif ($style == "path" and (($prevChar == $delimiter and $nextChar == $delimiter) or ($prevChar == $delimiter and $nextChar == "" and $varPos > 1))) {
-                        $regex = preg_replace("#".$delimiter.$varPattern."#", "(".$delimiter."(?P<".$variable.">".$capture."))?", $regex);
-                    } else {
-                        $regex = preg_replace("#".$varPattern."#", "((?P<".$variable.">".$capture."))?", $regex);
-                    }
-                } else {
-                    $regex = preg_replace("#".$varPattern."#", "(?P<".$variable.">".$capture.")", $regex);
-                }
-
-                $this->variables[$variable] = $this->getDefault($variable);
-            }
-        }
-
-        if ($style == "host") {
-            $regex = str_replace(".", "\.", $regex);
-        } else {
-            $regex = "/?".$regex;
-        }
-
-        return "#^".$regex.'$#siuD';
     }
 }
