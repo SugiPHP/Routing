@@ -536,29 +536,31 @@ class Route implements RouteInterface
         }
 
         preg_match_all("#\{(\w+)\}#", $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            $variable = $match[1][0];
-            $varPattern = $match[0][0]; // {variable}
-            $varPos = $match[0][1];
-            $capture = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
-            $nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
-            $prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
+        if (is_array($matches)) {
+            foreach ($matches as $match) {
+                $variable = $match[1][0];
+                $varPattern = $match[0][0]; // {variable}
+                $varPos = $match[0][1];
+                $capture = array_key_exists($variable, $requisites) ? $requisites[$variable] : $defaultRequisites;
+                $nextChar = (isset($pattern[$varPos + strlen($varPattern)])) ? $pattern[$varPos + strlen($varPattern)] : "";
+                $prevChar = ($varPos > 0) ? $pattern[$varPos - 1] : "";
 
-            if (array_key_exists($variable, $defaults)) {
-                // Make variables that have default values optional
-                // Also make delimiter (if next char is a delimiter) to be also optional
-                if ($style == "host" and $nextChar == $delimiter and ($prevChar == "" or $prevChar == $delimiter)) {
-                    $regex = preg_replace("#".$varPattern.$delimiter."#", "((?P<".$variable.">".$capture.")".$delimiter.")?", $regex);
-                } elseif ($style == "path" and (($prevChar == $delimiter and $nextChar == $delimiter) or ($prevChar == $delimiter and $nextChar == "" and $varPos > 1))) {
-                    $regex = preg_replace("#".$delimiter.$varPattern."#", "(".$delimiter."(?P<".$variable.">".$capture."))?", $regex);
+                if (array_key_exists($variable, $defaults)) {
+                    // Make variables that have default values optional
+                    // Also make delimiter (if next char is a delimiter) to be also optional
+                    if ($style == "host" and $nextChar == $delimiter and ($prevChar == "" or $prevChar == $delimiter)) {
+                        $regex = preg_replace("#".$varPattern.$delimiter."#", "((?P<".$variable.">".$capture.")".$delimiter.")?", $regex);
+                    } elseif ($style == "path" and (($prevChar == $delimiter and $nextChar == $delimiter) or ($prevChar == $delimiter and $nextChar == "" and $varPos > 1))) {
+                        $regex = preg_replace("#".$delimiter.$varPattern."#", "(".$delimiter."(?P<".$variable.">".$capture."))?", $regex);
+                    } else {
+                        $regex = preg_replace("#".$varPattern."#", "((?P<".$variable.">".$capture."))?", $regex);
+                    }
                 } else {
-                    $regex = preg_replace("#".$varPattern."#", "((?P<".$variable.">".$capture."))?", $regex);
+                    $regex = preg_replace("#".$varPattern."#", "(?P<".$variable.">".$capture.")", $regex);
                 }
-            } else {
-                $regex = preg_replace("#".$varPattern."#", "(?P<".$variable.">".$capture.")", $regex);
-            }
 
-            $this->variables[$variable] = $this->getDefault($variable);
+                $this->variables[$variable] = $this->getDefault($variable);
+            }
         }
 
         if ($style == "host") {
