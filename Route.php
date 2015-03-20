@@ -12,17 +12,16 @@ namespace SugiPHP\Routing;
 /**
  * Route is a set of rules used for routing.
  * Main rule is a path, but there are more:
+ *  - method (GET, POST, etc.)
  *  - host (domains, subdomains)
  *  - scheme (http or https)
- *  - method (GET, POST, etc.)
- *  - ...
  */
 class Route implements RouteInterface
 {
-    protected $path = "/";
-    protected $host = null; // null means all
-    protected $method = null; // null means all - GET, HEADER, POST, PUT, DELETE, ...
-    protected $scheme = null; // null means all - http, https
+    protected $path;
+    protected $host; // if not set means all
+    protected $method; // if not set means all - GET, HEADER, POST, PUT, DELETE, ...
+    protected $scheme; // if not set means all - http, https
     protected $defaults = array();
     protected $requisites = array();
     protected $variables = array();
@@ -265,10 +264,7 @@ class Route implements RouteInterface
      */
     public function setScheme($scheme)
     {
-        if (!in_array(strtolower($scheme), array("", "http", "https"))) {
-            $scheme = null;
-        }
-        $this->scheme = $scheme ?: null;
+        $this->scheme = $scheme;
 
         return $this;
     }
@@ -292,19 +288,19 @@ class Route implements RouteInterface
         // setting default values as a variables
         $this->variables = $this->defaults;
 
-        if ($this->matchPath($path) === false) {
-            return false;
-        }
-
         if ($this->matchMethod($method) === false) {
             return false;
         }
 
-        if ($this->matchHost($host) === false) {
+        if ($this->matchPath($path) === false) {
             return false;
         }
 
         if ($this->matchScheme($scheme) === false) {
+            return false;
+        }
+
+        if ($this->matchHost($host) === false) {
             return false;
         }
 
@@ -328,11 +324,12 @@ class Route implements RouteInterface
         // }
         // return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
 
-        if (!$this->getScheme()) {
+        // if it's empty it will not be == to scheme (and if it will)
+        if (empty($this->getScheme())) {
             return true;
         }
 
-        return ($this->getScheme() == $scheme);
+        return (strtolower($this->getScheme()) == strtolower($scheme));
     }
 
     /**
@@ -344,7 +341,7 @@ class Route implements RouteInterface
      */
     public function matchMethod($method)
     {
-        if (!$this->method) {
+        if (empty($this->method)) {
             return true;
         }
 
@@ -360,7 +357,7 @@ class Route implements RouteInterface
      */
     public function matchHost($host)
     {
-        if (!$this->getHost()) {
+        if (empty($this->getHost())) {
             return true;
         }
 

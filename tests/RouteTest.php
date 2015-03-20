@@ -492,7 +492,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         // all
         $route->setScheme("");
         $this->assertEquals("", $route->getScheme());
-        $this->assertSame(null, $route->getScheme());
     }
 
     public function testMatchScheme()
@@ -512,11 +511,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setScheme("http");
         $this->assertTrue($route->matchScheme("http"));
         $this->assertFalse($route->matchScheme("https"));
+        $this->assertTrue($route->matchScheme("HTTP"));
+        $this->assertFalse($route->matchScheme("HTTPS"));
 
         // only https
         $route->setScheme("https");
         $this->assertTrue($route->matchScheme("https"));
         $this->assertFalse($route->matchScheme("http"));
+        $this->assertTrue($route->matchScheme("HTTPS"));
+        $this->assertFalse($route->matchScheme("HTTP"));
     }
 
     public function testMethod()

@@ -47,7 +47,7 @@ class Router implements \Countable, \IteratorAggregate
      * otherwise it will be added to the end of the list.
      *
      * @param string $name The route's name
-     * @param RouterInterface $route
+     * @param RouteInterface $route
      *
      * @return Router
      */
@@ -132,7 +132,7 @@ class Router implements \Countable, \IteratorAggregate
     /**
      * Implements \IteratorAggregate
      *
-     * @return array
+     * @return \ArrayIterator
      */
     public function getIterator()
     {
@@ -148,7 +148,7 @@ class Router implements \Countable, \IteratorAggregate
      * @param string $host
      * @param string $scheme "http" or "https" scheme
      *
-     * @return array|null returns NULL if no route matches given parameters
+     * @return RouteInterface|null returns NULL if no route matches given parameters
      */
     public function getFirstMatch($path, $method = "", $host = "", $scheme = "")
     {
