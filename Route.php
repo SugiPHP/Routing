@@ -325,11 +325,11 @@ class Route implements RouteInterface
         // return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
 
         // if it's empty it will not be == to scheme (and if it will)
-        if (empty($this->getScheme())) {
+        if (empty($this->scheme)) {
             return true;
         }
 
-        return (strtolower($this->getScheme()) == strtolower($scheme));
+        return (strtolower($this->scheme) == strtolower($scheme));
     }
 
     /**
