@@ -36,6 +36,10 @@ class Router implements \Countable, \IteratorAggregate
     {
         // clear it
         unset($this->routes[$name]);
+        // Name the route
+        $route->setDefault("_name", $name);
+        // and Router
+        $route->setDefault("_router", $this);
         // add it to the bottom of the list
         $this->routes[$name] = $route;
 
@@ -122,7 +126,7 @@ class Router implements \Countable, \IteratorAggregate
      * Returns the number of routes in the list.
      * implements \Countable
      *
-     * @return integer
+     * @return int
      */
     public function count()
     {
@@ -148,12 +152,22 @@ class Router implements \Countable, \IteratorAggregate
      * @param string $host
      * @param string $scheme "http" or "https" scheme
      *
-     * @return RouteInterface|null returns NULL if no route matches given parameters
+     * @return RouteInterface or NULL if no route matches given parameters
      */
     public function getFirstMatch($path, $method = "", $host = "", $scheme = "")
     {
-        if ($match = $this->match($path, $method, $host, $scheme)) {
-            return $this->get($match["_name"]);
+        $this->checkedRoutes = array();
+        $this->path = $path;
+        $this->method = $method;
+        $this->host = $host;
+        $this->scheme = $scheme;
+
+        foreach ($this->routes as $name => $route) {
+            $this->checkedRoutes[] = $name;
+            $match = $route->match($path, $method, $host, $scheme);
+            if ($match !== false) {
+                return $route;
+            }
         }
     }
 
@@ -162,12 +176,18 @@ class Router implements \Countable, \IteratorAggregate
      *
      * @see getFirstMatch()
      *
-     * @return Route or NULL if no route matches given parameters
+     * @return RouteInterface or NULL if no route matches given parameters
      */
     public function getNextMatch()
     {
-        if ($match = $this->matchNext()) {
-            return $this->get($match["_name"]);
+        foreach ($this->routes as $name => $route) {
+            if (!in_array($name, $this->checkedRoutes)) {
+                $this->checkedRoutes[] = $name;
+                $match = $route->match($this->path, $this->method, $this->host, $this->scheme);
+                if ($match !== false) {
+                    return $route;
+                }
+            }
         }
     }
 
@@ -186,53 +206,5 @@ class Router implements \Countable, \IteratorAggregate
         }
 
         return $route->build($params, $pathType);
-    }
-
-    /**
-     * Walks through all registered routes and returns first route that matches
-     * the given parameters.
-     *
-     * @param string $path
-     * @param string $method "GET", "POST", "PUT" etc. HTTP methods
-     * @param string $host
-     * @param string $scheme "http" or "https" scheme
-     *
-     * @return array|null returns NULL if no route matches given parameters
-     */
-    protected function match($path, $method, $host, $scheme)
-    {
-        $this->checkedRoutes = array();
-        $this->path = $path;
-        $this->method = $method;
-        $this->host = $host;
-        $this->scheme = $scheme;
-
-        foreach ($this->routes as $name => $route) {
-            $this->checkedRoutes[] = $name;
-            $match = $route->match($path, $method, $host, $scheme);
-            if ($match !== false) {
-                return array_merge(array("_name" => $name/*, "_route" => $route*/), $match);
-            }
-        }
-    }
-
-    /**
-     * Continue matching registered routes.
-     *
-     * @see match()
-     *
-     * @return array|null returns NULL if no route matches given parameters
-     */
-    protected function matchNext()
-    {
-        foreach ($this->routes as $name => $route) {
-            if (!in_array($name, $this->checkedRoutes)) {
-                $this->checkedRoutes[] = $name;
-                $match = $route->match($this->path, $this->method, $this->host, $this->scheme);
-                if ($match !== false) {
-                    return array_merge(array("_name" => $name/*, "_route" => $route*/), $match);
-                }
-            }
-        }
     }
 }

@@ -450,9 +450,8 @@ class Route implements RouteInterface
             } elseif (!is_null($param)) {
                 if (!$param) {
                     return false;
-                } else {
-                    $replace = $param;
                 }
+                $replace = $param;
             } elseif (!is_null($default)) {
                 $replace = "";
             } else {
