@@ -172,10 +172,25 @@ class Router implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Builds an URI based on parameters given.
+     *
+     * @param string $name Route name
+     * @param array  $params
+     *
+     * @return string|null Will return URI or NULL if the route is not found
+     */
+    public function build($name, $params = array(), $pathType = Route::PATH_AUTO)
+    {
+        if (!$route = $this->get($name)) {
+            return null;
+        }
+
+        return $route->build($params, $pathType);
+    }
+
+    /**
      * Walks through all registered routes and returns first route that matches
      * the given parameters.
-     *
-     * @deprecated use getFirstMatch() which will return Route instead of array
      *
      * @param string $path
      * @param string $method "GET", "POST", "PUT" etc. HTTP methods
@@ -184,7 +199,7 @@ class Router implements \Countable, \IteratorAggregate
      *
      * @return array|null returns NULL if no route matches given parameters
      */
-    public function match($path, $method, $host, $scheme)
+    protected function match($path, $method, $host, $scheme)
     {
         $this->checkedRoutes = array();
         $this->path = $path;
@@ -204,13 +219,11 @@ class Router implements \Countable, \IteratorAggregate
     /**
      * Continue matching registered routes.
      *
-     * @deprecated use getNextMatch() which will return Route instead of array
-     *
      * @see match()
      *
      * @return array|null returns NULL if no route matches given parameters
      */
-    public function matchNext()
+    protected function matchNext()
     {
         foreach ($this->routes as $name => $route) {
             if (!in_array($name, $this->checkedRoutes)) {
@@ -221,22 +234,5 @@ class Router implements \Countable, \IteratorAggregate
                 }
             }
         }
-    }
-
-    /**
-     * Builds an URI based on parameters given.
-     *
-     * @param string $name Route name
-     * @param array  $params
-     *
-     * @return string|null Will return URI or NULL if the route is not found
-     */
-    public function build($name, $params = array(), $pathType = Route::PATH_AUTO)
-    {
-        if (!$route = $this->get($name)) {
-            return null;
-        }
-
-        return $route->build($params, $pathType);
     }
 }
