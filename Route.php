@@ -27,7 +27,7 @@ class Route implements RouteInterface
     protected $requisites = array();
     protected $variables = array();
 
-    protected $defaultPathRequisites = "[^/.,;?<>]+";
+    protected $defaultPathRequisites = "[^/,;?<>]+";
 
     /**
      * Constructor
