@@ -357,7 +357,7 @@ class Route implements RouteInterface
      */
     public function matchHost($host)
     {
-        if (empty($this->getHost())) {
+        if (empty($this->host)) {
             return true;
         }
 
