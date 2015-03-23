@@ -15,13 +15,8 @@ namespace SugiPHP\Routing;
 class PathCompiler implements CompilerInterface
 {
     /**
-     * Creates regular expression
-     *
-     * @param string $pattern
-     * @param array  $defaults
-     * @param array  $requisites
-     *
-     * @return string
+     * Implements CompilerInterface::compile() method
+     * {@inheritdoc}
      */
     public static function compile($pattern, $defaults, $requisites)
     {
@@ -57,6 +52,10 @@ class PathCompiler implements CompilerInterface
         return "#^".$regex.'$#siuD';
     }
 
+    /**
+     * Implements CompilerInterface::compile() method
+     * {@inheritdoc}
+     */
     public static function build($pattern, $parameters, $defaults, $requisites)
     {
         $defaultRequisites = "[^/,;?<>]+";

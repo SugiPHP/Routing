@@ -9,151 +9,18 @@
 
 namespace SugiPHP\Routing;
 
-class RouteTest extends \PHPUnit_Framework_TestCase
+class HostTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateWithPath()
-    {
-        $route = new Route("/");
-        $this->assertEquals("/", $route->getPath());
-
-        // leading slash
-        $route = new Route("");
-        $this->assertEquals("/", $route->getPath());
-
-        $route = new Route(null);
-        $this->assertEquals("/", $route->getPath());
-
-        $route = new Route(false);
-        $this->assertEquals("/", $route->getPath());
-
-        $route = new Route("/help");
-        $this->assertEquals("/help", $route->getPath());
-
-        // no trailing slash
-        $route = new Route("/help/");
-        $this->assertEquals("/help", $route->getPath());
-
-        // always with leading slash
-        $route = new Route("help");
-        $this->assertEquals("/help", $route->getPath());
-    }
-
     public function testSetMethodsReturnSelf()
     {
-        $route = new Route("/");
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setPath("/"));
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setDefaults(array()));
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setDefault("controller", "main"));
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setRequisites(array()));
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setRequisite("id", "\d+"));
-        $this->assertInstanceOf("\SugiPHP\Routing\Route", $route->setMethod("get"));
-    }
-
-    public function testPath()
-    {
-        // absolute valid
-        $route = new Route("/home");
-        $this->assertEquals("/home", $route->getPath());
-
-        // absolute valid
-        $route = new Route("/home.php");
-        $this->assertEquals("/home.php", $route->getPath());
-
-        // tries to fix wrong input
-        // This is not the right thing to do,
-        // so I'm removing it from the code!
-/*      $route = new Route("/home?page=2");
-        $this->assertEquals("/home", $route->getPath());
-        $route = new Route("/?page=2");
-        $this->assertEquals("/", $route->getPath());
-        $route = new Route("/home?page=2#tralala");
-        $this->assertEquals("/home", $route->getPath());
-        $route = new Route("/home#tralala");
-        $this->assertEquals("/home", $route->getPath());
-
-        // no fix for this!!!
-        $route = new Route("www.example.com/home");
-        $this->assertEquals("/www.example.com/home", $route->getPath());
-
-        // this is better
-        $route = new Route("http://www.example.com/home");
-        $this->assertEquals("/home", $route->getPath());
-        // but will NOT set host
-        $this->assertEquals("", $route->getHost());
-*/
-    }
-
-    public function testSegmentsInPath()
-    {
-        $route = new Route("admin/{controller}/{method}/{id}");
-        $this->assertEquals("/admin/{controller}/{method}/{id}", $route->getPath());
-    }
-
-    public function testSetPath()
-    {
-        $route = new Route("/");
-        $route->setPath("/home");
-        $this->assertEquals("/home", $route->getPath());
-    }
-
-    public function testCreateWithDefaults()
-    {
-        $route = new Route("/");
-        $this->assertEquals(array(), $route->getDefaults());
-
-        $route = new Route("/", array());
-        $this->assertEquals(array(), $route->getDefaults());
-
-        $route = new Route("/", array("key" => "value"));
-        $this->assertEquals(array("key" => "value"), $route->getDefaults());
-
-        $route = new Route("/", array("key" => "value", "test" => "test"));
-        $this->assertEquals(array("key" => "value", "test" => "test"), $route->getDefaults());
-    }
-
-    public function testSetDefaults()
-    {
-        $route = new Route("/");
-        $route->setDefaults(array("controller" => "main"));
-        $this->assertEquals(array("controller" => "main"), $route->getDefaults());
-        $route->setDefaults(array("controller" => "main", "action" => "index"));
-        $this->assertEquals(array("controller" => "main", "action" => "index"), $route->getDefaults());
-        // add a default
-        $route->setDefault("param", "one");
-        $this->assertEquals(array("controller" => "main", "action" => "index", "param" => "one"), $route->getDefaults());
-    }
-
-    public function testGetDefault()
-    {
-        $route = new Route("/");
-        $route->setDefaults(array("controller" => "main", "action" => "index"));
-        $this->assertEquals("main", $route->getDefault("controller"));
-        $this->assertEquals("index", $route->getDefault("action"));
-        $this->assertEquals("", $route->getDefault("test"));
-        $this->assertEquals(null, $route->getDefault("test"));
-        $this->assertEquals(false, $route->getDefault("test"));
-        // if there is no such default parameters returns NULL
-        $this->assertSame(null, $route->getDefault("test"));
-    }
-
-    public function testCreateWithRequisites()
-    {
-        $route = new Route("/", array());
-        $this->assertEquals(array(), $route->getRequisites());
-
-        $route = new Route("/", array(), array());
-        $this->assertEquals(array(), $route->getRequisites());
-
-        $route = new Route("/", array(), array("key" => "value"));
-        $this->assertEquals(array("key" => "value"), $route->getRequisites());
-
-        $route = new Route("/", array(), array("key" => "value", "test" => "test"));
-        $this->assertEquals(array("key" => "value", "test" => "test"), $route->getRequisites());
+        $route = new Host("/");
+        $this->assertInstanceOf("\SugiPHP\Routing\Host", $route->setHost("example.com"));
+        $this->assertInstanceOf("\SugiPHP\Routing\Host", $route->setScheme("http"));
     }
 
     public function testSetRequisites()
     {
-        $route = new Route("/");
+        $route = new Host("/");
         $route->setRequisites(array("lang" => "en|fr"));
         $this->assertEquals(array("lang" => "en|fr"), $route->getRequisites());
         $route->setRequisites(array("lang" => "en|fr", "id" => "\d+"));
@@ -166,7 +33,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequisite()
     {
-        $route = new Route("/");
+        $route = new Host("/");
         $route->setRequisites(array("lang" => "en|fr", "id" => "\d+"));
         $this->assertEquals("en|fr", $route->getRequisite("lang"));
         $this->assertEquals("\d+", $route->getRequisite("id"));
@@ -179,23 +46,23 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathWithNoPath()
     {
-        $route = new Route("/");
+        $route = new Host("/");
         $this->assertTrue($route->matchPath(""));
-        $route = new Route("/test");
+        $route = new Host("/test");
         $this->assertFalse($route->matchPath(""));
 
-        $route = new Route("");
+        $route = new Host("");
         $this->assertTrue($route->matchPath("/"));
-        $route = new Route("/");
+        $route = new Host("/");
         $this->assertTrue($route->matchPath("/"));
-        $route = new Route("/test");
+        $route = new Host("/test");
         $this->assertFalse($route->matchPath("/"));
     }
 
     public function testMatchSinglePath()
     {
         // ok
-        $route = new Route("/path");
+        $route = new Host("/path");
         $this->assertTrue($route->matchPath("/path"));
         // ok, route adds leading slash
         $this->assertTrue($route->matchPath("path"));
@@ -209,7 +76,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchLongPath()
     {
-        $route = new Route("/path/to/file.html");
+        $route = new Host("/path/to/file.html");
         $this->assertTrue($route->matchPath("/path/to/file.html"));
         // false
         $this->assertFalse($route->matchPath("/"));
@@ -221,7 +88,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathVariables()
     {
-        $route = new Route("/path/to/{file}");
+        $route = new Host("/path/to/{file}");
         // ok
         $this->assertTrue($route->matchPath("/path/to/file"));
         $this->assertTrue($route->matchPath("/path/to/file/"));
@@ -247,7 +114,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathVariablesWithDefault()
     {
-        $route = new Route("/path/to/{file}", array("file" => "index"));
+        $route = new Host("/path/to/{file}", array("file" => "index"));
         // ok
         $this->assertTrue($route->matchPath("/path/to/"));
         $this->assertTrue($route->matchPath("/path/to"));
@@ -255,7 +122,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchPath("/path/to/index"));
         $this->assertTrue($route->matchPath("/path/to/index.php"));
 
-        $route = new Route("/path/to/{file}", array("file" => ""));
+        $route = new Host("/path/to/{file}", array("file" => ""));
         // ok
         $this->assertTrue($route->matchPath("/path/to/"));
         $this->assertTrue($route->matchPath("/path/to"));
@@ -266,7 +133,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathVariableAndDot()
     {
-        $route = new Route("/path/to/file{ext}", array("ext" => ""));
+        $route = new Host("/path/to/file{ext}", array("ext" => ""));
 
         $this->assertTrue($route->matchPath("/path/to/filephp"));
         $this->assertTrue($route->matchPath("/path/to/file"));
@@ -283,7 +150,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathWithSpecialFormat()
     {
-        $route = new Route("/path/to/file.{_format}", array("_format" => ""));
+        $route = new Host("/path/to/file.{_format}", array("_format" => ""));
 
         $this->assertTrue($route->matchPath("/path/to/file.php"));
         $this->assertTrue($route->matchPath("/path/to/file"));
@@ -305,7 +172,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchPathVariablesWithRequirements()
     {
-        $route = new Route("/{lang}/index.php", array(), array("lang" => "en|bg"));
+        $route = new Host("/{lang}/index.php", array(), array("lang" => "en|bg"));
         // ok
         $this->assertTrue($route->matchPath("/en/index.php"));
         $this->assertTrue($route->matchPath("/bg/index.php"));
@@ -314,7 +181,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($route->matchPath("/index.php"));
 
         // same as above with default
-        $route = new Route("/{lang}/index.php", array("lang" => "en"), array("lang" => "en|bg"));
+        $route = new Host("/{lang}/index.php", array("lang" => "en"), array("lang" => "en|bg"));
         // ok
         $this->assertTrue($route->matchPath("/en/index.php"));
         $this->assertTrue($route->matchPath("/bg/index.php"));
@@ -323,7 +190,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($route->matchPath("/ru/index.php"));
 
         // more simple
-        $route = new Route("/{lang}", array(), array("lang" => "en|bg"));
+        $route = new Host("/{lang}", array(), array("lang" => "en|bg"));
         // ok
         $this->assertTrue($route->matchPath("/en"));
         $this->assertTrue($route->matchPath("/bg/"));
@@ -334,7 +201,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($route->matchPath(""));
 
         // with default
-        $route = new Route("/{lang}", array("lang" => "en"), array("lang" => "en|bg"));
+        $route = new Host("/{lang}", array("lang" => "en"), array("lang" => "en|bg"));
         // ok
         $this->assertTrue($route->matchPath("/en"));
         $this->assertTrue($route->matchPath("/bg/"));
@@ -348,7 +215,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testMatchMVC()
     {
         // this is real world example
-        $route = new Route("/{controller}/{action}/{param}", array("controller" => "home", "action" => "index", "param" => ""));
+        $route = new Host("/{controller}/{action}/{param}", array("controller" => "home", "action" => "index", "param" => ""));
         // ok
         $this->assertTrue($route->matchPath(""));
         $this->assertTrue($route->matchPath("/"));
@@ -359,10 +226,171 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchPath("/user/edit/ivan"));
     }
 
+    public function testHost()
+    {
+        $route = new Host("/");
+        $this->assertEquals("", $route->getHost());
+        // returns "" ? or it should be NULL / FALSE ?
+        $this->assertSame(null, $route->getHost());
+        $route->setHost("example.com");
+        $this->assertEquals("example.com", $route->getHost());
+        $route->setHost(null);
+        $this->assertEquals("", $route->getHost());
+        $this->assertSame(null, $route->getHost());
+
+        // wrong but will be fixed
+        // EDIT: this will not be fixed!
+        // $route->setHost("http://example.com/users/list?page=1");
+        // $this->assertEquals("example.com", $route->getHost());
+
+        // sub domain
+        $route->setHost("sub.example.com");
+        $this->assertEquals("sub.example.com", $route->getHost());
+
+        // check parameterized hosts
+        $route->setHost("{subdomain}.example.com");
+        $this->assertEquals("{subdomain}.example.com", $route->getHost());
+    }
+
+    public function testMatchHost()
+    {
+        $route = new Host("/");
+        $this->assertTrue($route->matchHost("example.com"));
+        $this->assertTrue($route->matchHost("sub.example.com"));
+
+        $route->setHost("example.com");
+        $this->assertTrue($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("www.example.com"));
+        $this->assertFalse($route->matchHost("sub.example.com"));
+        $this->assertFalse($route->matchHost("anything.com"));
+        $this->assertFalse($route->matchHost("example.net"));
+        $this->assertFalse($route->matchHost("foo.bar"));
+
+        $route->setHost("");
+        $this->assertTrue($route->matchHost("foobar.tld"));
+
+        $route->setHost("sub.example.com");
+        $this->assertTrue($route->matchHost("sub.example.com"));
+        $this->assertFalse($route->matchHost("sub.sub.example.com"));
+        $this->assertFalse($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("www.example.com"));
+        $this->assertFalse($route->matchHost("foo.bar"));
+    }
+
+    public function testMatchHostWithParam()
+    {
+        $route = new Host("/");
+        $route->setHost("{subdomain}.example.com");
+        $this->assertTrue($route->matchHost("sub.example.com"));
+        $this->assertTrue($route->matchHost("foobar.example.com"));
+        $this->assertFalse($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("sub.sub.example.com"));
+    }
+
+    public function testMatchHostWithParamAndDefaultValue()
+    {
+        $route = new Host("/");
+        $route->setHost("{subdomain}.example.com");
+        $route->setDefault("subdomain", "www");
+        $this->assertTrue($route->matchHost("sub.example.com"));
+        $this->assertTrue($route->matchHost("www.example.com"));
+        $this->assertTrue($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("sub.sub.example.com"));
+    }
+
+    public function testMatchHostWithParamAndRequisite()
+    {
+        $route = new Host("/");
+
+        $route->setHost("{subdomain}.example.com");
+        $route->setRequisite("subdomain", "en|bg");
+        $this->assertTrue($route->matchHost("en.example.com"));
+        $this->assertTrue($route->matchHost("bg.example.com"));
+        $this->assertFalse($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("bg.www.example.com"));
+        $this->assertFalse($route->matchHost("www.en.example.com"));
+        $this->assertFalse($route->matchHost("sr.example.com"));
+    }
+
+    public function testMatchHostWithParamDefaultAndRequisite()
+    {
+        $route = new Host("/");
+
+        $route->setHost("{subdomain}.example.com");
+        $route->setRequisite("subdomain", "en|bg");
+        $route->setDefault("subdomain", "en");
+        $this->assertTrue($route->matchHost("en.example.com"));
+        $this->assertTrue($route->matchHost("bg.example.com"));
+        $this->assertTrue($route->matchHost("example.com"));
+        $this->assertFalse($route->matchHost("bg.www.example.com"));
+        $this->assertFalse($route->matchHost("www.en.example.com"));
+        $this->assertFalse($route->matchHost("sr.example.com"));
+    }
+
+    public function testTLD()
+    {
+        $route = new Host("/");
+
+        $route->setHost("example.{tld}");
+        $this->assertTrue($route->matchHost("example.com"));
+        $this->assertTrue($route->matchHost("example.eu"));
+        $this->assertFalse($route->matchHost("foobar.com"));
+        $this->assertFalse($route->matchHost("www.example.eu"));
+    }
+
+    public function testScheme()
+    {
+        // all
+        $route = new Host("/");
+        $this->assertEquals("", $route->getScheme());
+        $this->assertSame(null, $route->getScheme());
+        // http only
+        $route->setScheme("http");
+        $this->assertEquals("http", $route->getScheme());
+        // all
+        $route->setScheme(null);
+        $this->assertEquals("", $route->getScheme());
+        $this->assertSame(null, $route->getScheme());
+        // https only
+        $route->setScheme("https");
+        $this->assertEquals("https", $route->getScheme());
+        // all
+        $route->setScheme("");
+        $this->assertEquals("", $route->getScheme());
+    }
+
+    public function testMatchScheme()
+    {
+        // no limitations
+        $route = new Host("/");
+        $this->assertTrue($route->matchScheme("http"));
+        $this->assertTrue($route->matchScheme("https"));
+        $this->assertTrue($route->matchScheme("http://"));
+        $this->assertTrue($route->matchScheme("https://"));
+        $this->assertTrue($route->matchScheme("HTTP"));
+        $this->assertTrue($route->matchScheme("HTTPS"));
+        // not http/https, but should not happen
+        $this->assertTrue($route->matchScheme("ftp"));
+
+        // only http
+        $route->setScheme("http");
+        $this->assertTrue($route->matchScheme("http"));
+        $this->assertFalse($route->matchScheme("https"));
+        $this->assertTrue($route->matchScheme("HTTP"));
+        $this->assertFalse($route->matchScheme("HTTPS"));
+
+        // only https
+        $route->setScheme("https");
+        $this->assertTrue($route->matchScheme("https"));
+        $this->assertFalse($route->matchScheme("http"));
+        $this->assertTrue($route->matchScheme("HTTPS"));
+        $this->assertFalse($route->matchScheme("HTTP"));
+    }
+
     public function testMethod()
     {
         // all
-        $route = new Route("/");
+        $route = new Host("/");
         $this->assertEquals("", $route->getMethod());
         $this->assertSame(null, $route->getMethod());
         // GET
@@ -387,7 +415,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testMatchMethod()
     {
         // all
-        $route = new Route("/");
+        $route = new Host("/");
         $this->assertTrue($route->matchMethod("GET"));
         $this->assertTrue($route->matchMethod("HEAD"));
         $this->assertTrue($route->matchMethod("POST"));
@@ -410,5 +438,27 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->matchMethod("post"));
         $this->assertFalse($route->matchMethod("GET"));
         $this->assertFalse($route->matchMethod("put"));
+    }
+
+    public function buildAutoPathType()
+    {
+        $route = new Host("test", new Host("/", array()));
+        $this->assertSame("/", $host->build("test", array(), Host::PATH_AUTO));
+        $this->assertSame("/", $host->build("test", array("_scheme" => "http"), Host::PATH_AUTO));
+        $this->assertSame("//example.com/", $host->build("test", array("_host" => "example.com"), Host::PATH_AUTO));
+        $this->assertSame("http://example.com/", $host->build("test", array("_host" => "example.com", "_scheme" => "http"), Host::PATH_AUTO));
+        $this->assertSame("https://example.com/", $host->build("test", array("_host" => "example.com", "_scheme" => "https"), Host::PATH_AUTO));
+        // check default is Host::PATH_AUTO
+        $this->assertSame("https://example.com/", $host->build("test", array("_host" => "example.com", "_scheme" => "https")));
+    }
+
+    public function testSpecificPathTypes()
+    {
+        $host = new Host("/");
+        $this->assertEquals("/", $host->build(array(), Host::PATH_NETWORK));
+        $this->assertEquals("//example.com/", $host->build(array("_host" => "example.com"), Host::PATH_NETWORK));
+        $this->assertEquals("//example.com/", $host->build(array("_host" => "example.com"), Host::PATH_FULL));
+        $this->assertEquals("http://example.com/", $host->build(array("_host" => "example.com", "_scheme" => "http"), Host::PATH_FULL));
+        $this->assertEquals("https://example.com/", $host->build(array("_host" => "example.com", "_scheme" => "https"), Host::PATH_FULL));
     }
 }

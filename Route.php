@@ -11,17 +11,12 @@ namespace SugiPHP\Routing;
 
 /**
  * Route is a set of rules used for routing.
- * Main rule is a path, but there are more:
- *  - method (GET, POST, etc.)
- *  - host (domains, subdomains)
- *  - scheme (http or https)
+ * Main rule is a path and a method (GET, POST, etc.)
  */
 class Route implements RouteInterface
 {
     protected $path;
-    protected $host; // if not set means all
     protected $method; // if not set means all - GET, HEADER, POST, PUT, DELETE, ...
-    protected $scheme; // if not set means all - http, https
     protected $defaults = array();
     protected $requisites = array();
     protected $variables = array();
@@ -200,36 +195,6 @@ class Route implements RouteInterface
     }
 
     /**
-     * Sets expected host (pattern)
-     *
-     * @param string $host
-     *
-     * @return Route
-     */
-    public function setHost($host)
-    {
-        // will NOT fix wrong hosts!
-        // $host = trim($host);
-        // if ((strpos($host, "http://") !== 0) and (strpos($host, "https://") !== 0)) {
-        //  $host = "http://" . $host;
-        // }
-        // $host = parse_url($host,  PHP_URL_HOST);
-        $this->host = $host ?: null;
-
-        return $this;
-    }
-
-    /**
-     * Returns expected host.
-     *
-     * @return string|null - returns null for ANY host
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    /**
      * Set request methods for which the Route should work.
      *
      * @param string|null $method - null matches any method
@@ -254,34 +219,10 @@ class Route implements RouteInterface
     }
 
     /**
-     * Expected HTTP scheme: "http" or "https"
-     *
-     * @param string|null $scheme - null means all
-     *
-     * @return Route
-     */
-    public function setScheme($scheme)
-    {
-        $this->scheme = $scheme;
-
-        return $this;
-    }
-
-    /**
-     * Returns expected scheme: "http" or "https"
-     *
-     * @return string|null - returns null for ANY scheme
-     */
-    public function getScheme()
-    {
-        return $this->scheme;
-    }
-
-    /**
      * Implements RouteInterface::match() method
      * {@inheritdoc}
      */
-    public function match($path, $method, $host, $scheme)
+    public function match($path, $method)
     {
         // setting default values as a variables
         $this->variables = $this->defaults;
@@ -294,40 +235,7 @@ class Route implements RouteInterface
             return false;
         }
 
-        if ($this->matchScheme($scheme) === false) {
-            return false;
-        }
-
-        if ($this->matchHost($host) === false) {
-            return false;
-        }
-
         return $this->variables;
-    }
-
-    /**
-     * Checks the given scheme is within accepted route schemes.
-     *
-     * @param string $scheme
-     *
-     * @return boolean
-     */
-    public function matchScheme($scheme)
-    {
-        // does not to be so complicated
-        // if ($this->scheme == "http") {
-        //  $regex = "http";
-        // } elseif ($this->scheme == "https") {
-        //  $regex = "https";
-        // }
-        // return (bool) preg_match("#^".$regex."(://)?$#i", $scheme);
-
-        // if it's empty it will not be == to scheme (and if it will)
-        if (empty($this->scheme)) {
-            return true;
-        }
-
-        return (strtolower($this->scheme) == strtolower($scheme));
     }
 
     /**
@@ -344,32 +252,6 @@ class Route implements RouteInterface
         }
 
         return (bool) preg_match("#" . str_replace("#", "\\#", $this->method)."#i", $method);
-    }
-
-    /**
-     * Checks the given host matches route's host.
-     *
-     * @param string $host - like "sub.example.com"
-     *
-     * @return boolean
-     */
-    public function matchHost($host)
-    {
-        if (empty($this->host)) {
-            return true;
-        }
-
-        if (preg_match(HostCompiler::compile($this->getHost(), $this->defaults, $this->requisites), $host, $matches)) {
-            // add matches in array to know variables in host name
-            foreach ($matches as $var => $value) {
-                if (!is_int($var) && $value) {
-                    $this->variables[$var] = $value;
-                }
-            }
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -417,33 +299,9 @@ class Route implements RouteInterface
      * Implements RouteInterface::build() method
      * {@inheritdoc}
      */
-    public function build(array $parameters = array(), $pathType = self::PATH_AUTO)
+    public function build(array $parameters = array())
     {
         $path = PathCompiler::build($this->path, $parameters, $this->defaults, $this->requisites);
-
-        if ($pathType == self::PATH_AUTO) {
-            if (!empty($parameters["_host"])) {
-                if (!empty($parameters["_scheme"])) {
-                    $pathType = self::PATH_FULL;
-                } else {
-                    $pathType = self::PATH_NETWORK;
-                }
-            } else {
-                $pathType = self::PATH_ONLY;
-            }
-        }
-
-        if (($pathType == self::PATH_NETWORK) || ($pathType == self::PATH_FULL)) {
-            if (isset($parameters["_host"])) {
-                $path = "//" . $parameters["_host"] . $path;
-                if ($pathType == self::PATH_FULL) {
-                    $scheme =  (isset($parameters["_scheme"])) ? $scheme = $parameters["_scheme"] : $scheme = $this->getScheme();
-                    if ($scheme) {
-                        $path = $scheme . ":" . $path;
-                    }
-                }
-            }
-        }
 
         return $path;
     }

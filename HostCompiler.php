@@ -15,13 +15,8 @@ namespace SugiPHP\Routing;
 class HostCompiler implements CompilerInterface
 {
     /**
-     * Creates regular expression
-     *
-     * @param string $pattern
-     * @param array  $defaults
-     * @param array  $requisites
-     *
-     * @return string
+     * Implements CompilerInterface::compile() method
+     * {@inheritdoc}
      */
     public static function compile($pattern, $defaults, $requisites)
     {
@@ -59,6 +54,10 @@ class HostCompiler implements CompilerInterface
         return "#^".$regex.'$#siuD';
     }
 
+    /**
+     * Implements CompilerInterface::build() method
+     * {@inheritdoc}
+     */
     public static function build($pattern, $parameters, $defaults, $requisites)
     {
         return $pattern;

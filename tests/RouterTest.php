@@ -57,28 +57,4 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("/", $router->build("mvc", array("controller" => false)));
         $this->assertSame("/", $router->build("mvc", array("controller" => "home")));
     }
-
-    public function testBuildWithPathType()
-    {
-        $router = new Router();
-        $router->add("test", new Route("/", array()));
-        $this->assertSame("/", $router->build("test", array(), Route::PATH_ONLY));
-        $this->assertSame("/", $router->build("test", array(), Route::PATH_NETWORK));
-        $this->assertSame("/", $router->build("test", array(), Route::PATH_FULL));
-
-        // with _host
-        $this->assertSame("/", $router->build("test", array("_host" => "example.com"), Route::PATH_ONLY));
-        $this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com"), Route::PATH_NETWORK));
-        $this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com"), Route::PATH_FULL));
-
-        // with _scheme, no _host
-        $this->assertSame("/", $router->build("test", array("_scheme" => "https"), Route::PATH_ONLY));
-        $this->assertSame("/", $router->build("test", array("_scheme" => "https"), Route::PATH_NETWORK));
-        $this->assertSame("/", $router->build("test", array("_scheme" => "https"), Route::PATH_FULL));
-
-        // with _scheme and _host
-        $this->assertSame("/", $router->build("test", array("_host" => "example.com", "_scheme" => "https"), Route::PATH_ONLY));
-        $this->assertSame("//example.com/", $router->build("test", array("_host" => "example.com", "_scheme" => "https"), Route::PATH_NETWORK));
-        $this->assertSame("https://example.com/", $router->build("test", array("_host" => "example.com", "_scheme" => "https"), Route::PATH_FULL));
-    }
 }
