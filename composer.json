@@ -1,8 +1,8 @@
 {
     "name": "sugiphp/routing",
     "type": "library",
-    "description": "Routing",
-    "keywords": ["route"],
+    "description": "Router (Discontinued)",
+    "keywords": [],
     "license": "MIT",
     "authors": [
         {

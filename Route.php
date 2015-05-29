@@ -317,4 +317,14 @@ class Route implements RouteInterface
     {
         return isset($this->variables[$var]) ? $this->variables[$var] : null;
     }
+
+    /**
+     * Returns all variables.
+     *
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->variables;
+    }
 }
